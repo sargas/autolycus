@@ -20,6 +20,7 @@ public class Routes implements BaseColumns {
 	
 	static final String TABLE_NAME = "routes";
 	
-	public static final String Route = "rt";
+	public static final String RouteNumber = "rt";
+	public static final String RouteName = "rtnm";
 	public static final String System = "system";
 }

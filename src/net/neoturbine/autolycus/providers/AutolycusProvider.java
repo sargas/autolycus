@@ -3,6 +3,10 @@
  */
 package net.neoturbine.autolycus.providers;
 
+import java.util.ArrayList;
+
+import net.neoturbine.autolycus.BusTimeAPI;
+import net.neoturbine.autolycus.data.Route;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -44,9 +48,10 @@ public class AutolycusProvider extends ContentProvider {
 			//TODO (potentially): convert to specialized methods in SQLiteDatabase
 			StringBuilder str = new StringBuilder();
 			str.append("CREATE TABLE ").append(Routes.TABLE_NAME)
-			.append(" (").append(Routes._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
-			.append(Routes.Route).append("' VARCHAR(255) UNIQUE, '")
-			.append(Routes.System).append("' VARCHAR(255)")
+			.append(" ('").append(Routes._ID).append("' INTEGER PRIMARY KEY AUTOINCREMENT, '")
+			.append(Routes.System).append("' VARCHAR(255), '")
+			.append(Routes.RouteNumber).append("' VARCHAR(255) UNIQUE, '")
+			.append(Routes.RouteName).append("' VARCHAR(255) UNIQUE")
 			.append(");");
 			db.execSQL(str.toString());
 			
@@ -58,17 +63,15 @@ public class AutolycusProvider extends ContentProvider {
 			.append(");");
 			db.execSQL(str.toString());
 			
-			str = new StringBuilder();
-			str.append("INSERT INTO ").append(Systems.TABLE_NAME)
-			.append(" (").append(Systems.Name).append(", ").append(Systems.Abbrivation)
-			.append(") VALUES ('Chicago Transit Authority', 'CTA')");
-			db.execSQL(str.toString());
+			ContentValues cta = new ContentValues();
+			cta.put(Systems.Name, "Chicago Transit Authority");
+			cta.put(Systems.Abbrivation, "CTA");
+			db.insert(Systems.TABLE_NAME, null, cta);
 			
-			str = new StringBuilder();
-			str.append("INSERT INTO ").append(Systems.TABLE_NAME)
-			.append(" (").append(Systems.Name).append(", ").append(Systems.Abbrivation)
-			.append(") VALUES ('Ohio State University TRIP', 'OSU TRIP')");
-			db.execSQL(str.toString());
+			ContentValues trip = new ContentValues();
+			trip.put(Systems.Name, "Ohio State University TRIP");
+			trip.put(Systems.Abbrivation, "OSU TRIP");
+			db.insert(Systems.TABLE_NAME, null, trip);
 		}
 
 		@Override
@@ -134,6 +137,8 @@ public class AutolycusProvider extends ContentProvider {
 		switch(uriMatcher.match(uri)) {
 		case URI_ROUTES:
 			qb.setTables(Routes.TABLE_NAME);
+			//selection should be 'system=?'
+			fetchRoutes(selectionArgs[0]);
 			break;
 		case URI_SYSTEMS:
 			qb.setTables(Systems.TABLE_NAME);
@@ -145,6 +150,24 @@ public class AutolycusProvider extends ContentProvider {
 		Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, sortOrder);
 		c.setNotificationUri(getContext().getContentResolver(), uri);
 		return c;
+	}
+	
+	private void fetchRoutes(String system) {
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		try {
+			db.delete(Routes.TABLE_NAME,
+					Routes.System +"=?", new String[] {system});
+			ArrayList<Route> routes = BusTimeAPI.getRoutes(getContext(), system);
+			for(Route r : routes) {
+				ContentValues cv = new ContentValues();
+				cv.put(Routes.RouteName, r.getName());
+				cv.put(Routes.RouteNumber, r.getRt());
+				cv.put(Routes.System, r.getSystem());
+				db.insert(Routes.TABLE_NAME, null, cv);
+			}
+		} catch (Exception e) {
+			Log.e(TAG,e.toString());
+		}
 	}
 
 	/* (non-Javadoc)

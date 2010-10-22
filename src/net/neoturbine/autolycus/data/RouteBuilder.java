@@ -53,7 +53,7 @@ public final class RouteBuilder implements Serializable{
 		}
 		
 		public Route toRoute() {
-			return new Route(system,rt);
+			return new Route(system,rt,name);
 		}
 
 }

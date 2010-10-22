@@ -47,7 +47,7 @@ public final class BusTimeAPI {
 			if(system.equals("Chicago Transit Authority")) {
 				server = "www.ctabustracker.com";
 				key = "HeDbySM4CUDgRDsrGnRGZmD6K";
-			} else if(system.equals("OSU TRIP")) {
+			} else if(system.equals("Ohio State University TRIP")) {
 				server = "trip.osu.edu";
 				key = "auixft7SWR3pWAcgkQfnfJpXt";
 			}
