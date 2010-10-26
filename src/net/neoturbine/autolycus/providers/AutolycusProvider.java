@@ -4,9 +4,10 @@
 package net.neoturbine.autolycus.providers;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import net.neoturbine.autolycus.BusTimeAPI;
-import net.neoturbine.autolycus.data.Route;
+import net.neoturbine.autolycus.internal.BusTimeAPI;
+import net.neoturbine.autolycus.internal.Route;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -33,10 +34,12 @@ public class AutolycusProvider extends ContentProvider {
 	private static final UriMatcher uriMatcher;
 	private static final int URI_ROUTES = 1;
 	private static final int URI_SYSTEMS = 2;
+	private static final int URI_DIRECTIONS = 3;
 	static {
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		uriMatcher.addURI(AUTHORITY, Routes.TABLE_NAME, URI_ROUTES);
 		uriMatcher.addURI(AUTHORITY, Systems.TABLE_NAME, URI_SYSTEMS);
+		uriMatcher.addURI(AUTHORITY, Directions.TABLE_NAME, URI_DIRECTIONS);
 	}
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
@@ -74,6 +77,16 @@ public class AutolycusProvider extends ContentProvider {
 			trip.put(Systems.Name, "Ohio State University TRIP");
 			trip.put(Systems.Abbrivation, "OSU TRIP");
 			db.insert(Systems.TABLE_NAME, null, trip);
+			
+			str = new StringBuilder();
+			str.append("CREATE TABLE ").append(Directions.TABLE_NAME)
+			.append(" (").append(Directions._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
+			.append(Directions.System).append("' VARCHAR(255), '")
+			.append(Directions.RouteNumber).append("' VARCHAR(255), '")
+			.append(Directions.Direction).append("' VARCHAR(255), '")
+			.append(Directions.Expiration).append("' INTEGER")
+			.append(");");
+			db.execSQL(str.toString());
 		}
 
 		@Override
@@ -106,6 +119,8 @@ public class AutolycusProvider extends ContentProvider {
 			return Routes.CONTENT_TYPE;
 		case URI_SYSTEMS:
 			return Systems.CONTENT_TYPE;
+		case URI_DIRECTIONS:
+			return Directions.CONTENT_TYPE;
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
@@ -140,13 +155,17 @@ public class AutolycusProvider extends ContentProvider {
 		case URI_ROUTES:
 			qb.setTables(Routes.TABLE_NAME);
 			//selection should be 'system=?'
-			Log.v(TAG,"Performing a route query on "+selectionArgs[0]);
 			fetchRoutes(selectionArgs[0]);
 			break;
 		case URI_SYSTEMS:
 			qb.setTables(Systems.TABLE_NAME);
-			Log.v(TAG,"Performing a system query");
 			break;
+		case URI_DIRECTIONS:
+			qb.setTables(Directions.TABLE_NAME);
+			//selection should be 'system=? AND rt=?'
+			fetchDirections(selectionArgs[0],selectionArgs[1]);
+			break;
+			
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
@@ -186,6 +205,41 @@ public class AutolycusProvider extends ContentProvider {
 			Log.e(TAG,e.toString());
 		}
 	}
+	
+	public void fetchDirections(String system, String rt) {
+		final SQLiteDatabase db = dbHelper.getWritableDatabase();
+		try {
+			final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+			qb.setTables(Directions.TABLE_NAME);
+			/* don't query unless I am the only one querying/inserting */
+			synchronized(this) {
+				final Cursor c = qb.query(db,null,
+						Directions.System+" = ? AND "+
+						Directions.RouteNumber+" = ? AND "+
+						Directions.Expiration+" > ?",
+						new String[] {system, rt, new Long(getToday()).toString()},
+						null, null, null);
+				if(c.moveToLast()) {
+					c.close();return;
+				} else c.close();
+				db.delete(Directions.TABLE_NAME,
+						Directions.System +"=? AND "+
+						Directions.RouteNumber+"=?",
+						new String[] {system, rt});
+				ArrayList<String> dirs = BusTimeAPI.getDirections(getContext(), system, rt);
+				for(String d : dirs) {
+					ContentValues cv = new ContentValues();
+					cv.put(Directions.System, system);
+					cv.put(Directions.RouteNumber,rt);
+					cv.put(Directions.Direction, d);
+					cv.put(Routes.Expiration, getFuture());
+					db.insert(Directions.TABLE_NAME, null, cv);
+				}
+			}
+		} catch (Exception e) {
+			Log.e(TAG,e.toString());
+		}
+	}
 
 	private long getTomorrow() {
 		return getToday() + DateUtils.DAY_IN_MILLIS;
@@ -193,6 +247,12 @@ public class AutolycusProvider extends ContentProvider {
 
 	private long getToday() {
 		return new Date().getTime();
+	}
+	
+	private long getFuture() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(2030, 1, 1);
+		return cal.getTimeInMillis();
 	}
 
 	/* (non-Javadoc)

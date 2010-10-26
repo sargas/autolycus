@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.neoturbine.autolycus.data;
+package net.neoturbine.autolycus.internal;
 
 import java.io.Serializable;
 

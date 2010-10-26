@@ -1,13 +1,11 @@
 /**
  * 
  */
-package net.neoturbine.autolycus;
+package net.neoturbine.autolycus.internal;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import net.neoturbine.autolycus.data.Route;
-import net.neoturbine.autolycus.data.RouteBuilder;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -127,5 +125,50 @@ public final class BusTimeAPI {
 		
 		return routes;
 	}
+	
+	public static ArrayList<String> getDirections(Context context,String system, String route) throws Exception {
+		//we don't check the date of the cache since we're going to assume
+		//the route directions will never ever ever change
+		//Bad assumption? we'll see
+		ArrayList<String> directions = new ArrayList<String>();
+		try {
+			Bundle params = new Bundle();
+			params.putString("rt", route);
+			XmlPullParser xpp = BusTimeAPI.loadData(context,
+					"getdirections", system, params);
+			int eventType = xpp.getEventType();
+			String curTag = "";
+			while (eventType != XmlPullParser.END_DOCUMENT) {
+				switch(eventType) {
+				case XmlPullParser.START_TAG:
+					curTag = xpp.getName();
+					if(curTag.equals("dir")) { //on to new route
+						//nothing yet
+					}
+					break;
+				case XmlPullParser.TEXT:
+					String text = xpp.getText().trim();
+					if(!curTag.equals("") && !text.equals("")) {
+						 if(curTag.equals("error")) {
+							//eck, we got a problem
+							throw new Exception(text);
+						}
+						directions.add(text);
+					}
+					break;
+				case XmlPullParser.END_TAG:
+					curTag = "";
+					break;
+				}
+				eventType = xpp.next();
+			}
+		} catch (Exception ex) {
+			Log.e(TAG, ex.toString());
+			throw ex;
+		}
+		
+		return directions;
+	}
+
 
 }

@@ -8,16 +8,13 @@ import android.widget.ListView;
 
 public class SelectStop extends ListActivity {
 	public static final String SELECT_STOP = "net.neoturbine.autolycus.SELECT_STOP";
-	public static final String RESULT_STOP_KEY = "net.neoturbine.autolycus.SelectDirection.STOP";
-	public static final String EXTRA_KEY_ROUTE = "net.neoturbine.autolycus.SelectStop.ROUTE";
-	public static final String EXTRA_KEY_DIRECTION = "net.neoturbine.autolycus.SelectStop.DIRECTION";
+	public static final String EXTRA_SYSTEM = "net.neoturbine.autolycus.SelectStop.SYSTEM";
+	public static final String EXTRA_ROUTE = "net.neoturbine.autolycus.SelectStop.ROUTE";
+	public static final String EXTRA_DIRECTION = "net.neoturbine.autolycus.SelectStop.DIRECTION";
 	
 	public static final String TAG = "Autolycus";
 	
-	//protected Route route;
 	protected String direction;
-	//protected ArrayList<StopInfo> stops;
-	protected Exception tempEx;
 
 	/** Called when the activity is first created. */
 	@Override
