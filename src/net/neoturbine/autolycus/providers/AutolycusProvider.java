@@ -140,10 +140,12 @@ public class AutolycusProvider extends ContentProvider {
 		case URI_ROUTES:
 			qb.setTables(Routes.TABLE_NAME);
 			//selection should be 'system=?'
+			Log.v(TAG,"Performing a route query on "+selectionArgs[0]);
 			fetchRoutes(selectionArgs[0]);
 			break;
 		case URI_SYSTEMS:
 			qb.setTables(Systems.TABLE_NAME);
+			Log.v(TAG,"Performing a system query");
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
@@ -159,14 +161,15 @@ public class AutolycusProvider extends ContentProvider {
 		try {
 			final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 			qb.setTables(Routes.TABLE_NAME);
-			final Cursor c = qb.query(db,null,
-					Routes.System+" = ? AND "+
-					Routes.Expiration+" < ?",
-					new String[] {system, new Long(getToday()).toString()}, null, null, null);
-			if(!c.moveToLast()) {
-				c.close();return;
-			} else c.close();
+			/* don't query unless I am the only one querying/inserting */
 			synchronized(this) {
+				final Cursor c = qb.query(db,null,
+						Routes.System+" = ? AND "+
+						Routes.Expiration+" > ?",
+						new String[] {system, new Long(getToday()).toString()}, null, null, null);
+				if(c.moveToLast()) {
+					c.close();return;
+				} else c.close();
 				db.delete(Routes.TABLE_NAME,
 						Routes.System +"=?", new String[] {system});
 				ArrayList<Route> routes = BusTimeAPI.getRoutes(getContext(), system);
