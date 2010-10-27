@@ -67,8 +67,7 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 			final String dir = c.getString(c.getColumnIndexOrThrow(Directions.Direction));
 			getStop(dir);
 		}
-    }
-    
+    }    
     
     
     protected void getStop(String direction) {

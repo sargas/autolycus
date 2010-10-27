@@ -17,7 +17,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -166,9 +165,55 @@ public final class BusTimeAPI {
 			Log.e(TAG, ex.toString());
 			throw ex;
 		}
-		
 		return directions;
 	}
+	
+	public static ArrayList<StopInfo> getStops(Context context,String system, String route, String direction) throws Exception {
+		ArrayList<StopInfo> stops = new ArrayList<StopInfo>();
+		Bundle params = new Bundle();
+		params.putString("rt", route);
+		params.putString("dir", direction);
+		try {
+			XmlPullParser xpp = BusTimeAPI.loadData(context,
+					"getstops", system, params);
+			int eventType = xpp.getEventType();
+			String curTag = "";
+			StopInfoBuilder curBuilder = new StopInfoBuilder(system);
+			while (eventType != XmlPullParser.END_DOCUMENT) {
+				switch(eventType) {
+				case XmlPullParser.START_TAG:
+					curTag = xpp.getName();
+					if(curTag.equals("stop")) { //on to new route
+						curBuilder.setRoute(route);
+						curBuilder.setDir(direction);
+						stops.add(curBuilder.toStopInfo());
+						curBuilder = new StopInfoBuilder(system);
+					}
+					break;
+				case XmlPullParser.TEXT:
+					String text = xpp.getText().trim();
+					if(!curTag.equals("") && !text.equals("")) {
+						 if(curTag.equals("msg")) {
+							//eck, we got a problem
+							throw new Exception("Unreconigized "+text);
+						}
+						curBuilder.setField(curTag, text);
+					}
+					break;
+				case XmlPullParser.END_TAG:
+					curTag = "";
+					break;
+				}
+				eventType = xpp.next();
+			}
+		} catch (Exception ex) {
+			Log.e(TAG, ex.toString());
+			throw ex;
+		}
+		
+		return stops;
+	}
+
 
 
 }

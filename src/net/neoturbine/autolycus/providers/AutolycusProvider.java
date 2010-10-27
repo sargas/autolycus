@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import net.neoturbine.autolycus.internal.BusTimeAPI;
 import net.neoturbine.autolycus.internal.Route;
+import net.neoturbine.autolycus.internal.StopInfo;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,11 +36,13 @@ public class AutolycusProvider extends ContentProvider {
 	private static final int URI_ROUTES = 1;
 	private static final int URI_SYSTEMS = 2;
 	private static final int URI_DIRECTIONS = 3;
+	private static final int URI_STOPS = 4;
 	static {
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		uriMatcher.addURI(AUTHORITY, Routes.TABLE_NAME, URI_ROUTES);
 		uriMatcher.addURI(AUTHORITY, Systems.TABLE_NAME, URI_SYSTEMS);
 		uriMatcher.addURI(AUTHORITY, Directions.TABLE_NAME, URI_DIRECTIONS);
+		uriMatcher.addURI(AUTHORITY, Stops.TABLE_NAME, URI_STOPS);
 	}
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
@@ -87,6 +90,20 @@ public class AutolycusProvider extends ContentProvider {
 			.append(Directions.Expiration).append("' INTEGER")
 			.append(");");
 			db.execSQL(str.toString());
+			
+			str = new StringBuilder();
+			str.append("CREATE TABLE ").append(Stops.TABLE_NAME)
+			.append(" (").append(Stops._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
+			.append(Stops.System).append("' VARCHAR(255), '")
+			.append(Stops.RouteNumber).append("' VARCHAR(255), '")
+			.append(Stops.Direction).append("' VARCHAR(255), '")
+			.append(Stops.Name).append("' VARCHAR(255), '")
+			.append(Stops.StopID).append("' INTEGER, '")
+			.append(Stops.Longitude).append("' REAL, '")
+			.append(Stops.Latitude).append("' REAL, '")
+			.append(Stops.Expiration).append("' INTEGER")
+			.append(");");
+			db.execSQL(str.toString());
 		}
 
 		@Override
@@ -121,6 +138,8 @@ public class AutolycusProvider extends ContentProvider {
 			return Systems.CONTENT_TYPE;
 		case URI_DIRECTIONS:
 			return Directions.CONTENT_TYPE;
+		case URI_STOPS:
+			return Stops.CONTENT_TYPE;
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
@@ -165,7 +184,11 @@ public class AutolycusProvider extends ContentProvider {
 			//selection should be 'system=? AND rt=?'
 			fetchDirections(selectionArgs[0],selectionArgs[1]);
 			break;
-			
+		case URI_STOPS:
+			qb.setTables(Stops.TABLE_NAME);
+			//selection should be 'system=? rt=? dir=?'
+			fetchStops(selectionArgs[0],selectionArgs[1],selectionArgs[2]);
+			break;
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
@@ -206,7 +229,7 @@ public class AutolycusProvider extends ContentProvider {
 		}
 	}
 	
-	public void fetchDirections(String system, String rt) {
+	private void fetchDirections(String system, String rt) {
 		final SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try {
 			final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
@@ -232,8 +255,49 @@ public class AutolycusProvider extends ContentProvider {
 					cv.put(Directions.System, system);
 					cv.put(Directions.RouteNumber,rt);
 					cv.put(Directions.Direction, d);
-					cv.put(Routes.Expiration, getFuture());
+					cv.put(Directions.Expiration, getFuture());
 					db.insert(Directions.TABLE_NAME, null, cv);
+				}
+			}
+		} catch (Exception e) {
+			Log.e(TAG,e.toString());
+		}
+	}
+	
+	private void fetchStops(String system, String rt, String dir) {
+		final SQLiteDatabase db = dbHelper.getWritableDatabase();
+		try {
+			final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+			qb.setTables(Stops.TABLE_NAME);
+			/* don't query unless I am the only one querying/inserting */
+			synchronized(this) {
+				final Cursor c = qb.query(db,null,
+						Stops.System+" = ? AND "+
+						Stops.RouteNumber+" = ? AND "+
+						Stops.Direction+" = ? AND "+
+						Stops.Expiration+" > ?",
+						new String[] {system, rt, dir, new Long(getToday()).toString()},
+						null, null, null);
+				if(c.moveToLast()) {
+					c.close();return;
+				} else c.close();
+				db.delete(Stops.TABLE_NAME,
+						Stops.System +"=? AND "+
+						Stops.RouteNumber+"=? AND "+
+						Stops.Direction+"=?",
+						new String[] {system, rt, dir});
+				ArrayList<StopInfo> stops = BusTimeAPI.getStops(getContext(), system, rt,dir);
+				for(StopInfo stop : stops) {
+					ContentValues cv = new ContentValues();
+					cv.put(Stops.System, system);
+					cv.put(Stops.RouteNumber,rt);
+					cv.put(Stops.Direction, dir);
+					cv.put(Stops.Name, stop.getStpnm());
+					cv.put(Stops.StopID, stop.getStpid());
+					cv.put(Stops.Longitude, stop.getLon());
+					cv.put(Stops.Latitude, stop.getLat());
+					cv.put(Stops.Expiration, getTomorrow());
+					db.insert(Stops.TABLE_NAME, null, cv);
 				}
 			}
 		} catch (Exception e) {
