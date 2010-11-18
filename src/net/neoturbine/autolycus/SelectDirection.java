@@ -1,6 +1,7 @@
 package net.neoturbine.autolycus;
 
 import net.neoturbine.autolycus.providers.Directions;
+import net.neoturbine.autolycus.providers.Routes;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -16,25 +17,29 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 	public static final String EXTRA_RT = "net.neoturbine.autolycus.SelectDirection.ROUTE";
 	public static final String EXTRA_SYS = "net.neoturbine.autolycus.SelectDirection.SYSTEM";
 	public static final String TAG = "Autolycus";
-	
-	public static final int STOP_REQUEST_CODE = 0;
-	
+
+	private static final int PICK_ROUTE = 2;
+
 	//private ArrayList<String> directions;
 	//private Route route;
 	private String rt;
 	private String system;
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	    super.onCreate(savedInstanceState);
-	    final Intent intent = getIntent();
-        
-	    rt = intent.getStringExtra(EXTRA_RT);
-	    system = intent.getStringExtra(EXTRA_SYS);
-	    
-	    getListView().setOnItemClickListener(this);
-	    
+		super.onCreate(savedInstanceState);
+		final Intent intent = getIntent();
+
+		if(intent.getAction().equals(Intent.ACTION_PICK)) {
+			Intent routeintent = new Intent(Intent.ACTION_PICK,Routes.CONTENT_URI);
+			startActivityForResult(routeintent, PICK_ROUTE);
+		}
+	}
+
+	private void loadDirections() {
+		getListView().setOnItemClickListener(this);
+
 		new AsyncTask<Void, Void, Cursor>() {
 			@Override
 			protected Cursor doInBackground(Void... params) {
@@ -59,34 +64,36 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 				}
 			}
 		}.execute();
-    }
+	}
 
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 		if(position >= 0) {
 			final Cursor c = (Cursor) parent.getItemAtPosition(position);
 			final String dir = c.getString(c.getColumnIndexOrThrow(Directions.Direction));
-			getStop(dir);
+			setResult(RESULT_OK,getStop(dir));
+			finish();
 		}
-    }    
-    
-    
-    protected void getStop(String direction) {
-    	Intent getStop = new Intent();
-    	
-    	getStop.setAction(SelectStop.SELECT_STOP);
-    	getStop.putExtra(SelectStop.EXTRA_SYSTEM, system);
-    	getStop.putExtra(SelectStop.EXTRA_ROUTE, rt);
-    	getStop.putExtra(SelectStop.EXTRA_DIRECTION, direction);
-    	
-    	startActivityForResult(getStop,STOP_REQUEST_CODE);
-    }
-    
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	if (requestCode == STOP_REQUEST_CODE) {
-    		if(resultCode == RESULT_OK) {
-    			setResult(RESULT_OK,data); //moving along
-    			finish();
-    		}
-    	}
-    }
+	}    
+
+
+	protected Intent getStop(String direction) {
+		Intent forStop = new Intent();
+
+		forStop.setAction(SelectStop.SELECT_STOP);
+		forStop.putExtra(SelectStop.EXTRA_SYSTEM, system);
+		forStop.putExtra(SelectStop.EXTRA_ROUTE, rt);
+		forStop.putExtra(SelectStop.EXTRA_DIRECTION, direction);
+
+		return forStop;
+	}
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == PICK_ROUTE) {
+			if(resultCode == RESULT_OK) {
+				rt = data.getStringExtra(EXTRA_RT);
+				system = data.getStringExtra(EXTRA_SYS);
+				loadDirections();
+			}
+		}
+	}
 }

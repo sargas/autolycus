@@ -48,7 +48,7 @@ public final class BusTimeAPI {
 				server = "trip.osu.edu";
 				key = "auixft7SWR3pWAcgkQfnfJpXt";
 			}
-			
+
 			qparams.add(new BasicNameValuePair("key",key));
 
 			//assemble the url
@@ -121,10 +121,10 @@ public final class BusTimeAPI {
 			Log.e(TAG, ex.toString()); //automatic logging
 			throw ex;
 		}
-		
+
 		return routes;
 	}
-	
+
 	public static ArrayList<String> getDirections(Context context,String system, String route) throws Exception {
 		//we don't check the date of the cache since we're going to assume
 		//the route directions will never ever ever change
@@ -148,7 +148,7 @@ public final class BusTimeAPI {
 				case XmlPullParser.TEXT:
 					String text = xpp.getText().trim();
 					if(!curTag.equals("") && !text.equals("")) {
-						 if(curTag.equals("error")) {
+						if(curTag.equals("error")) {
 							//eck, we got a problem
 							throw new Exception(text);
 						}
@@ -167,7 +167,7 @@ public final class BusTimeAPI {
 		}
 		return directions;
 	}
-	
+
 	public static ArrayList<StopInfo> getStops(Context context,String system, String route, String direction) throws Exception {
 		ArrayList<StopInfo> stops = new ArrayList<StopInfo>();
 		Bundle params = new Bundle();
@@ -184,16 +184,18 @@ public final class BusTimeAPI {
 				case XmlPullParser.START_TAG:
 					curTag = xpp.getName();
 					if(curTag.equals("stop")) { //on to new route
-						curBuilder.setRoute(route);
-						curBuilder.setDir(direction);
-						stops.add(curBuilder.toStopInfo());
+						if(curBuilder.getName() != null) { //finished a route
+							curBuilder.setRoute(route);
+							curBuilder.setDir(direction);
+							stops.add(curBuilder.toStopInfo());
+						}
 						curBuilder = new StopInfoBuilder(system);
 					}
 					break;
 				case XmlPullParser.TEXT:
 					String text = xpp.getText().trim();
 					if(!curTag.equals("") && !text.equals("")) {
-						 if(curTag.equals("msg")) {
+						if(curTag.equals("msg")) {
 							//eck, we got a problem
 							throw new Exception("Unreconigized "+text);
 						}
@@ -210,7 +212,7 @@ public final class BusTimeAPI {
 			Log.e(TAG, ex.toString());
 			throw ex;
 		}
-		
+
 		return stops;
 	}
 

@@ -15,7 +15,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 public class SelectRoute extends ListActivity implements OnItemClickListener {
-	public static final int DIRECTION_REQUEST_CODE = 0;
 	public static final String SELECT_ROUTE = "net.neoturbine.autolycus.SELECT_ROUTE";
 	private Spinner systemSpin;
 	private String system;
@@ -95,17 +94,10 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 		if(position >= 0) {
 			final Cursor c = (Cursor) parent.getItemAtPosition(position);
 			final String selectedRoute = c.getString(c.getColumnIndexOrThrow(Routes.RouteNumber));
-			final Intent getdir = new Intent();
-			getdir.setAction(SelectDirection.SELECT_DIRECTION);
-			getdir.putExtra(SelectDirection.EXTRA_RT, selectedRoute);
-			getdir.putExtra(SelectDirection.EXTRA_SYS, system);
-			startActivityForResult(getdir,DIRECTION_REQUEST_CODE);
-		}
-	}
-
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == DIRECTION_REQUEST_CODE && resultCode == RESULT_OK) {
-			setResult(RESULT_OK, data); //passing along...
+			final Intent dirintent = new Intent();
+			dirintent.putExtra(SelectDirection.EXTRA_RT, selectedRoute);
+			dirintent.putExtra(SelectDirection.EXTRA_SYS, system);
+			setResult(RESULT_OK,dirintent);
 			finish();
 		}
 	}

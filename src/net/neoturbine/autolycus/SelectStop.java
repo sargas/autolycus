@@ -1,5 +1,6 @@
 package net.neoturbine.autolycus;
 
+import net.neoturbine.autolycus.providers.Directions;
 import net.neoturbine.autolycus.providers.Stops;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -17,12 +18,16 @@ public class SelectStop extends ListActivity  implements OnItemClickListener{
 	public static final String EXTRA_SYSTEM = "net.neoturbine.autolycus.SelectStop.SYSTEM";
 	public static final String EXTRA_ROUTE = "net.neoturbine.autolycus.SelectStop.ROUTE";
 	public static final String EXTRA_DIRECTION = "net.neoturbine.autolycus.SelectStop.DIRECTION";
+	public static final String EXTRA_STOPID = "net.neoturbine.autolycus.SelectStop.StopID";
+	public static final String EXTRA_STOPNAME = "net.neoturbine.autolycus.SelectStop.StopName";
 
 	public static final String TAG = "Autolycus";
 
 	private String system;
 	private String route;
 	private String direction;
+	
+	private static final int PICK_DIRECTION = 0;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -33,17 +38,20 @@ public class SelectStop extends ListActivity  implements OnItemClickListener{
 		//show download progress
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-		system = intent.getStringExtra(EXTRA_SYSTEM);
-		route = intent.getStringExtra(EXTRA_ROUTE);
-		direction = intent.getStringExtra(EXTRA_DIRECTION);
-
+		if(intent.getAction().equals(Intent.ACTION_PICK)) {
+			Intent dirintent = new Intent(Intent.ACTION_PICK,Directions.CONTENT_URI);
+			startActivityForResult(dirintent, PICK_DIRECTION);
+		}
+	}
+	
+	private void loadStops() {
 		getListView().setOnItemClickListener(this);
 
 		new AsyncTask<Void, Void, Cursor>() {
 			@Override
 			protected Cursor doInBackground(Void... params) {
 				final String[] PROJECTION = new String[] {
-						Stops._ID, Stops.Name
+						Stops._ID, Stops.Name, Stops.StopID
 				};
 				return managedQuery(Stops.CONTENT_URI, PROJECTION,
 						Stops.System+" =? AND "+
@@ -64,17 +72,32 @@ public class SelectStop extends ListActivity  implements OnItemClickListener{
 				}
 			}
 		}.execute();
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode,
+            Intent data) {
+		if(requestCode == PICK_DIRECTION) {
+			if(resultCode == RESULT_OK) {
+				system = data.getStringExtra(EXTRA_SYSTEM);
+				route = data.getStringExtra(EXTRA_ROUTE);
+				direction = data.getStringExtra(EXTRA_DIRECTION);
 
+				loadStops();
+			}
+		}
 	}
 
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 		if(position >= 0) {
-			//final Cursor c = (Cursor) parent.getItemAtPosition(position);
-			//final String dir = c.getString(c.getColumnIndexOrThrow(Directions.Direction));
-			//getStop(dir);
 			Intent result = new Intent();
 			result.setAction(Intent.ACTION_DEFAULT);
-			//result.putExtra(RESULT_STOP_KEY, ((StopInfo)l.getItemAtPosition(position)).toBundle());
+			result.putExtra(EXTRA_SYSTEM, system);
+			result.putExtra(EXTRA_DIRECTION, direction);
+			result.putExtra(EXTRA_ROUTE, route);
+			final Cursor c = (Cursor) parent.getItemAtPosition(position);
+			result.putExtra(EXTRA_STOPID, c.getInt(c.getColumnIndexOrThrow(Stops.StopID)));
+			result.putExtra(EXTRA_STOPNAME, c.getString(c.getColumnIndexOrThrow(Stops.Name)));
 			setResult(RESULT_OK,result);
 			finish();
 		}
