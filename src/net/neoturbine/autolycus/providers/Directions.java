@@ -7,7 +7,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * @author joe
+ * @author Joseph Booker
  *
  */
 public class Directions implements BaseColumns {

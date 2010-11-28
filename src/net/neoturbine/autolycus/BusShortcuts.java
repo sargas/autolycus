@@ -67,7 +67,7 @@ public class BusShortcuts extends Activity {
 	
 	public void returnShortcut() {
 		Intent shortcutIntent =  new Intent();
-		shortcutIntent.setAction("hi");
+		shortcutIntent.setAction(StopPrediction.OPEN_STOP_ACTION);
 		shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		shortcutIntent
 			.putExtra(SelectStop.EXTRA_SYSTEM, system)

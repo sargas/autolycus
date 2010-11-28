@@ -4,4 +4,5 @@
 	<string name="shortcut_stopname">Name</string>
 	<string name="shortcut_stopnamehint">This will appear on the home screen.</string>
 	<string name="shortcut_submit">Create Shortcut</string>
+	<string name="no_arrival">No arrival times available.</string>
 </resources>

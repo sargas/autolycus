@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import net.neoturbine.autolycus.internal.BusTimeAPI;
+import net.neoturbine.autolycus.internal.Prediction;
 import net.neoturbine.autolycus.internal.Route;
 import net.neoturbine.autolycus.internal.StopInfo;
 import android.content.ContentProvider;
@@ -14,6 +15,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
@@ -37,12 +39,14 @@ public class AutolycusProvider extends ContentProvider {
 	private static final int URI_SYSTEMS = 2;
 	private static final int URI_DIRECTIONS = 3;
 	private static final int URI_STOPS = 4;
+	private static final int URI_PREDICTIONS = 5;
 	static {
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		uriMatcher.addURI(AUTHORITY, Routes.TABLE_NAME, URI_ROUTES);
 		uriMatcher.addURI(AUTHORITY, Systems.TABLE_NAME, URI_SYSTEMS);
 		uriMatcher.addURI(AUTHORITY, Directions.TABLE_NAME, URI_DIRECTIONS);
 		uriMatcher.addURI(AUTHORITY, Stops.TABLE_NAME, URI_STOPS);
+		uriMatcher.addURI(AUTHORITY, Predictions.TABLE_NAME, URI_PREDICTIONS);
 	}
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
@@ -104,13 +108,31 @@ public class AutolycusProvider extends ContentProvider {
 			.append(Stops.Expiration).append("' INTEGER")
 			.append(");");
 			db.execSQL(str.toString());
+			
+			/*str = new StringBuilder();
+			str.append("CREATE TABLE ").append(Predictions.TABLE_NAME)
+			.append(" (").append(Predictions._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
+			.append(Predictions.System).append("' VARCHAR(255), '")
+			.append(Predictions.RouteNumber).append("' VARCHAR(255), '")
+			.append(Predictions.Direction).append("' VARCHAR(255), '")
+			.append(Predictions.StopName).append("' VARCHAR(255), '")
+			.append(Predictions.StopID).append("' INTEGER, '")
+			.append(Predictions.Destination).append("' VARCHAR(255), '")
+			.append(Predictions.DistanceToStop).append("' INTEGER, '")
+			.append(Predictions.EstimatedTime).append("' INTEGER, '")
+			.append(Predictions.isDelayed).append("' INTEGER, '")
+			.append(Predictions.PredictionTime).append("' INTEGER, '")
+			.append(Predictions.Type).append("' VARCHAR(1), '")
+			.append(Predictions.VehicleID).append("' INTEGER, '")
+			.append(Predictions.Expiration).append("' INTEGER")
+			.append(");");
+			db.execSQL(str.toString());*/
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
 					+ ", which will destroy all old data");
-			db.execSQL("DROP TABLE IF EXISTS " + Routes.TABLE_NAME);
 			onCreate(db);
 		}
 	}
@@ -140,6 +162,8 @@ public class AutolycusProvider extends ContentProvider {
 			return Directions.CONTENT_TYPE;
 		case URI_STOPS:
 			return Stops.CONTENT_TYPE;
+		case URI_PREDICTIONS:
+			return Predictions.CONTENT_TYPE;
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
@@ -189,6 +213,10 @@ public class AutolycusProvider extends ContentProvider {
 			//selection should be 'system=? rt=? dir=?'
 			fetchStops(selectionArgs[0],selectionArgs[1],selectionArgs[2]);
 			break;
+		case URI_PREDICTIONS:
+			//selection should be
+			//'system=? stpid=?'
+			return fetchPreds(selectionArgs[0],selectionArgs[1]);
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
@@ -303,6 +331,35 @@ public class AutolycusProvider extends ContentProvider {
 		} catch (Exception e) {
 			Log.e(TAG,e.toString());
 		}
+	}
+	
+	private Cursor fetchPreds(String system, String stpid) {
+		MatrixCursor cur = new MatrixCursor(Predictions.getColumns);
+		try {
+			ArrayList<Prediction> preds = BusTimeAPI.getPrediction(getContext(), system, stpid);
+			int i = 0;
+			for(Prediction pred : preds) {
+				MatrixCursor.RowBuilder row = cur.newRow();
+				row.add(i++);
+				row.add(pred.getRoute());
+				row.add(system);
+				row.add(pred.getDirection());
+				row.add(pred.getStopID());
+				row.add(pred.getStopName());
+				row.add(pred.getVid());
+				row.add(pred.getDistance());
+				row.add(pred.isDelayed());
+				row.add(pred.getDestination());
+				row.add(pred.getType());
+				row.add(pred.getEstTime().getTime());
+				row.add(pred.getPredTime().getTime());
+			}
+		} catch (Exception e) {
+			Log.e(TAG,e.toString() + " "+e.getStackTrace()[0].getFileName()
+					+ " "+e.getStackTrace()[0].getLineNumber());
+			return null;
+		}
+		return cur;
 	}
 
 	private long getTomorrow() {

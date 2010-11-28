@@ -14,20 +14,12 @@
 		</activity>
 		<activity android:name="SelectRoute">
 			<intent-filter>
-				<action android:name="net.neoturbine.autolycus.SELECT_ROUTE" />
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-			<intent-filter>
 				<action android:name="android.intent.action.PICK" />
-				<category android:name = "android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.DEFAULT" />
 				<data android:mimeType="vnd.android.cursor.dir/vnd.autolycus.routes" />
 			</intent-filter>
 		</activity>
 		<activity android:name="SelectDirection">
-			<intent-filter>
-				<action android:name="net.neoturbine.autolycus.SELECT_DIRECTION" />
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
 			<intent-filter>
 				<action android:name="android.intent.action.PICK" />
 				<category android:name="android.intent.category.DEFAULT" />
@@ -36,13 +28,15 @@
 		</activity>
 		<activity android:name="SelectStop">
 			<intent-filter>
-				<action android:name="net.neoturbine.autolycus.SELECT_STOP" />
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-			<intent-filter>
 				<action android:name="android.intent.action.PICK" />
 				<category android:name="android.intent.category.DEFAULT" />
 				<data android:mimeType="vnd.android.cursor.dir/vnd.autolycus.stops" />
+			</intent-filter>
+		</activity>
+		<activity android:name="StopPrediction">
+			<intent-filter>
+				<action android:name="net.neoturbine.autolycus.openstop" />
+				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
 	</application>
