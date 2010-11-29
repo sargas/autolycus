@@ -1,5 +1,9 @@
 package net.neoturbine.autolycus;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import net.neoturbine.autolycus.providers.Predictions;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -19,6 +23,8 @@ public class StopPrediction extends ListActivity {
 	private String direction;
 	private int stpid;
 	private String stpnm;
+	
+	private ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
 
 	/**
 	 * 
@@ -58,8 +64,18 @@ public class StopPrediction extends ListActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-
-		updatePredictions();
+		
+		//very very very ugly. asynctask must be run from UI thread
+		timer.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				 StopPrediction.this.runOnUiThread(new Runnable() {
+					 public void run() {
+						 updatePredictions();
+					 }
+				 });
+			}
+		}, 0, 60, TimeUnit.SECONDS);
 	}
 
 	private void updatePredictions() {

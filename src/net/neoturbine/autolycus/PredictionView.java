@@ -7,13 +7,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class PredictionView extends LinearLayout {
-	private static final String TAG = "Autolycus";
 	private Cursor pred;
 	/*private boolean stopinfo; //if true, be verbose
 	
@@ -35,7 +33,6 @@ public class PredictionView extends LinearLayout {
 	public PredictionView(Context context, AttributeSet a) {
 		super(context,a);
 		init(context);
-		Log.v(TAG,"view - created in shorter constructor");
 	}
 	
 	private void init(Context context) {
