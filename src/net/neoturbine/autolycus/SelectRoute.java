@@ -25,9 +25,10 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 		super.onCreate(savedInstanceState);
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setProgressBarIndeterminateVisibility(true);
 
 		setContentView(R.layout.routepicker);
-
+		
 		getListView().setOnItemClickListener(this);
 		systemSpin = (Spinner) findViewById(R.id.system_spinner);
 		loadSystems();
@@ -53,10 +54,8 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 					int pos, long id) {
 				Cursor cur = (Cursor)parent.getItemAtPosition(pos);
 
-				setProgressBarIndeterminateVisibility(true);
 				system = cur.getString(cur.getColumnIndex(Systems.Name));
 				loadRoutes();
-				setProgressBarIndeterminateVisibility(false);
 			}
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {}
@@ -65,6 +64,10 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 
 	public void loadRoutes() {
 		new AsyncTask<Void, Void, Cursor>() {
+			@Override
+			protected void onPreExecute() {
+				setProgressBarIndeterminateVisibility(true);
+			}
 			@Override
 			protected Cursor doInBackground(Void... params) {
 				final String[] PROJECTION = new String[] {
@@ -75,6 +78,7 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 			}
 			@Override
 			protected void onPostExecute(Cursor result) {
+				setProgressBarIndeterminateVisibility(false);
 				if(rva != null) {
 					rva.changeCursor(result);
 				} else {

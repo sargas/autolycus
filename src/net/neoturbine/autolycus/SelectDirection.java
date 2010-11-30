@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SimpleCursorAdapter;
@@ -29,6 +30,10 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setProgressBarIndeterminateVisibility(true);
+		
 		final Intent intent = getIntent();
 
 		if(intent.getAction().equals(Intent.ACTION_PICK)) {
@@ -42,6 +47,10 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 
 		new AsyncTask<Void, Void, Cursor>() {
 			@Override
+			protected void onPreExecute() {
+				setProgressBarIndeterminateVisibility(true);
+			}
+			@Override
 			protected Cursor doInBackground(Void... params) {
 				final String[] PROJECTION = new String[] {
 						Directions._ID, Directions.Direction
@@ -53,6 +62,7 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 			}
 			@Override
 			protected void onPostExecute(Cursor result) {
+				setProgressBarIndeterminateVisibility(false);
 				if(getListAdapter() != null) {
 					((SimpleCursorAdapter)getListAdapter()).changeCursor(result);
 				} else {

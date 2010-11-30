@@ -24,7 +24,7 @@ public class StopPrediction extends ListActivity {
 	private int stpid;
 	private String stpnm;
 	
-	private ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
+	private ScheduledExecutorService timer;
 
 	/**
 	 * 
@@ -35,7 +35,6 @@ public class StopPrediction extends ListActivity {
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setProgressBarIndeterminateVisibility(true); // do this while loading ui
-		// too
 
 		loadIntent();
 	}
@@ -64,7 +63,8 @@ public class StopPrediction extends ListActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+		if(timer == null || timer.isShutdown())
+			timer = Executors.newScheduledThreadPool(1);
 		//very very very ugly. asynctask must be run from UI thread
 		timer.scheduleWithFixedDelay(new Runnable() {
 			@Override
@@ -77,9 +77,19 @@ public class StopPrediction extends ListActivity {
 			}
 		}, 0, 60, TimeUnit.SECONDS);
 	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		if(timer != null) timer.shutdown();
+	}
 
 	private void updatePredictions() {
 		new AsyncTask<Void, Void, Cursor>() {
+			@Override
+			protected void onPreExecute() {
+				setProgressBarIndeterminateVisibility(true);
+			}
 			@Override
 			protected Cursor doInBackground(Void... params) {
 				return managedQuery(Predictions.CONTENT_URI,
