@@ -49,6 +49,10 @@ public class SelectStop extends ListActivity  implements OnItemClickListener{
 
 		new AsyncTask<Void, Void, Cursor>() {
 			@Override
+			protected void onPreExecute() {
+				setProgressBarIndeterminateVisibility(true);
+			}
+			@Override
 			protected Cursor doInBackground(Void... params) {
 				final String[] PROJECTION = new String[] {
 						Stops._ID, Stops.Name, Stops.StopID
@@ -61,6 +65,7 @@ public class SelectStop extends ListActivity  implements OnItemClickListener{
 			}
 			@Override
 			protected void onPostExecute(Cursor result) {
+				setProgressBarIndeterminateVisibility(false);
 				if(getListAdapter() != null) {
 					((SimpleCursorAdapter)getListAdapter()).changeCursor(result);
 				} else {
