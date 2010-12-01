@@ -242,7 +242,6 @@ public final class BusTimeAPI {
 					curTag = xpp.getName();
 					if (curTag.equals("prd")) { // on to new prediction
 						if(curBuilder.isSet()) {
-							Log.v(TAG,curBuilder.toPrediction().toString());
 							preds.add(curBuilder.toPrediction());
 						}
 						curBuilder = new PredictionBuilder();

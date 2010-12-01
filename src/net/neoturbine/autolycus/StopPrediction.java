@@ -3,13 +3,15 @@ package net.neoturbine.autolycus;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
 import net.neoturbine.autolycus.providers.Predictions;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.SimpleCursorAdapter;
@@ -23,8 +25,10 @@ public class StopPrediction extends ListActivity {
 	private String direction;
 	private int stpid;
 	private String stpnm;
-	
+
 	private ScheduledExecutorService timer;
+
+	private boolean limitRoute = false;
 
 	/**
 	 * 
@@ -63,69 +67,98 @@ public class StopPrediction extends ListActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		if(timer == null || timer.isShutdown())
-			timer = Executors.newScheduledThreadPool(1);
-		//very very very ugly. asynctask must be run from UI thread
-		timer.scheduleWithFixedDelay(new Runnable() {
-			@Override
-			public void run() {
-				 StopPrediction.this.runOnUiThread(new Runnable() {
-					 public void run() {
-						 updatePredictions();
-					 }
-				 });
-			}
-		}, 0, 60, TimeUnit.SECONDS);
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		if(timer != null) timer.shutdown();
+		updatePredictions();
 	}
 
 	private void updatePredictions() {
-		new AsyncTask<Void, Void, Cursor>() {
+		if (timer != null)
+			timer.shutdown();
+		timer = Executors.newScheduledThreadPool(1);
+
+		// very very very ugly. asynctask must be run from UI thread
+		timer.scheduleWithFixedDelay(new Runnable() {
 			@Override
-			protected void onPreExecute() {
-				setProgressBarIndeterminateVisibility(true);
+			public void run() {
+				StopPrediction.this.runOnUiThread(new Runnable() {
+					public void run() {
+						new UpdatePredictionsTask().execute();
+					}
+				});
 			}
-			@Override
-			protected Cursor doInBackground(Void... params) {
+		}, 0, 60, TimeUnit.SECONDS);
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		if (timer != null)
+			timer.shutdown();
+	}
+
+	private class UpdatePredictionsTask extends AsyncTask<Void, Void, Cursor> {
+		@Override
+		protected void onPreExecute() {
+			setProgressBarIndeterminateVisibility(true);
+		}
+
+		@Override
+		protected Cursor doInBackground(Void... params) {
+			if (!limitRoute)
 				return managedQuery(Predictions.CONTENT_URI,
 						Predictions.getColumns, Predictions.System + "=? AND "
 								+ Predictions.StopID + "=?", new String[] {
 								system, Integer.toString(stpid) }, null);
-			}
+			else
+				return managedQuery(Predictions.CONTENT_URI,
+						Predictions.getColumns, Predictions.System + "=? AND "
+								+ Predictions.StopID + "=? AND "
+								+ Predictions.RouteNumber + "=?", new String[] {
+								system, Integer.toString(stpid), route }, null);
+		}
 
-			@Override
-			protected void onPostExecute(Cursor cur) {
-				setProgressBarIndeterminateVisibility(false);
+		@Override
+		protected void onPostExecute(Cursor cur) {
+			setProgressBarIndeterminateVisibility(false);
 
-				setListAdapter(null);
-				((TextView) findViewById(R.id.txt_stop_error)).setText("");
+			setListAdapter(null);
+			((TextView) findViewById(R.id.txt_stop_error)).setText("");
 
-				SimpleCursorAdapter adp = new SimpleCursorAdapter(
-						StopPrediction.this, R.layout.prediction, cur,
-						new String[] { Predictions._ID },
-						new int[] { R.id.prediction_entry });
+			SimpleCursorAdapter adp = new SimpleCursorAdapter(
+					StopPrediction.this, R.layout.prediction, cur,
+					new String[] { Predictions._ID },
+					new int[] { R.id.prediction_entry });
 
-				adp.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-					@Override
-					public boolean setViewValue(View view, Cursor cursor,
-							int columnIndex) {
-						PredictionView pred = (PredictionView) view;
-						pred.setPrediction(cursor);
-						return true;
-					}
-				});
+			adp.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+				@Override
+				public boolean setViewValue(View view, Cursor cursor,
+						int columnIndex) {
+					PredictionView pred = (PredictionView) view;
+					pred.setPrediction(cursor, !limitRoute);
+					return true;
+				}
+			});
 
-				if (cur.getCount() != 0)
-					setListAdapter(adp);
-				else
-					((TextView) findViewById(R.id.txt_stop_error))
-							.setText(R.string.no_arrival);
-			}
-		}.execute();
+			if (cur.getCount() != 0)
+				setListAdapter(adp);
+			else
+				((TextView) findViewById(R.id.txt_stop_error))
+						.setText(R.string.no_arrival);
+		}
+	}
+	
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.prediction, menu);
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case R.id.prediction_showall:
+			limitRoute = !limitRoute;
+			updatePredictions();
+			return true;
+		}
+		return false;
 	}
 }

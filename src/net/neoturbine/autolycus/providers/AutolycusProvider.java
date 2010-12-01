@@ -215,8 +215,9 @@ public class AutolycusProvider extends ContentProvider {
 			break;
 		case URI_PREDICTIONS:
 			//selection should be
-			//'system=? stpid=?'
-			return fetchPreds(selectionArgs[0],selectionArgs[1]);
+			//'system=? stpid=? [route=?]'
+			return fetchPreds(selectionArgs[0],selectionArgs[1],
+					selectionArgs.length==2?null:selectionArgs[2]);
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
@@ -333,12 +334,13 @@ public class AutolycusProvider extends ContentProvider {
 		}
 	}
 	
-	private Cursor fetchPreds(String system, String stpid) {
+	private Cursor fetchPreds(String system, String stpid, String route) {
 		MatrixCursor cur = new MatrixCursor(Predictions.getColumns);
 		try {
 			ArrayList<Prediction> preds = BusTimeAPI.getPrediction(getContext(), system, stpid);
 			int i = 0;
 			for(Prediction pred : preds) {
+				if(route != null && !pred.getRoute().equals(route)) continue;
 				MatrixCursor.RowBuilder row = cur.newRow();
 				row.add(i++);
 				row.add(pred.getRoute());

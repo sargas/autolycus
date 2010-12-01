@@ -7,16 +7,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
-import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class PredictionView extends LinearLayout {
 	private Cursor pred;
-	/*private boolean stopinfo; //if true, be verbose
+	private boolean stopinfo; //if true, be verbose
 	
-	private TextView nameView; //for verbosity
-	private TextView dirView;*/
+	private TextView routeView; //for verbosity
 	
 	private TextView timeView;
 	private TextView predView;
@@ -36,22 +36,20 @@ public class PredictionView extends LinearLayout {
 	}
 	
 	private void init(Context context) {
-		this.setOrientation(VERTICAL);
+		LayoutInflater l = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View rellayout = l.inflate(R.layout.predictionview, this);
 		
-		timeView = new TextView(context);
-		timeView.setTextSize(20);
-		addView(timeView, new LinearLayout.LayoutParams(
-				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		predView = new TextView(context);
-		predView.setGravity(Gravity.RIGHT);
-		addView(predView, new LinearLayout.LayoutParams(
-				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		timeView = (TextView)rellayout.findViewById(R.id.predictionview_timeview);
+		routeView = (TextView)rellayout.findViewById(R.id.predictionview_routeview);
+		predView = (TextView)rellayout.findViewById(R.id.predictionview_predview);
 	}
 	
 	public void resetLabels() {
 		long estTime = pred.getLong(pred.getColumnIndexOrThrow(Predictions.EstimatedTime));
 		int predType = pred.getInt(pred.getColumnIndexOrThrow(Predictions.Type));
 		long predTime = pred.getLong(pred.getColumnIndexOrThrow(Predictions.PredictionTime));
+		String route = pred.getString(pred.getColumnIndexOrThrow(Predictions.RouteNumber));
+		String dir = pred.getString(pred.getColumnIndexOrThrow(Predictions.Direction));
 		if(Math.abs(System.currentTimeMillis() - estTime) < 60*1000) {
 			if(predType == PredictionBuilder.ARRIVAL_PREDICTION)
 				timeView.setText(formatter.format(estTime) +" - Arriving now!");
@@ -64,10 +62,15 @@ public class PredictionView extends LinearLayout {
 		}
 
 		predView.setText("Predicted: "+formatter.format(predTime));
+		if(stopinfo)
+			routeView.setText(route + " - "+dir);
+		else
+			routeView.setText("");
 	}
 	
-	public void setPrediction(Cursor pred) {
+	public void setPrediction(Cursor pred, boolean showAllInfo) {
 		this.pred = pred;
+		this.stopinfo = showAllInfo;
 		resetLabels();
 	}
 
