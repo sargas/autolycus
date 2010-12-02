@@ -20,6 +20,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 
@@ -30,6 +31,7 @@ import android.util.Log;
 public class AutolycusProvider extends ContentProvider {
 	private static final String TAG = "Autolycus";
 	public static final String AUTHORITY = "net.neoturbine.providers.autolycus";
+	public static final String ERROR_MSG = "error";
 
 	private static final String DATABASE_NAME = "cache.db";
 	private static final int DATABASE_VERSION = 1;
@@ -108,25 +110,6 @@ public class AutolycusProvider extends ContentProvider {
 			.append(Stops.Expiration).append("' INTEGER")
 			.append(");");
 			db.execSQL(str.toString());
-			
-			/*str = new StringBuilder();
-			str.append("CREATE TABLE ").append(Predictions.TABLE_NAME)
-			.append(" (").append(Predictions._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
-			.append(Predictions.System).append("' VARCHAR(255), '")
-			.append(Predictions.RouteNumber).append("' VARCHAR(255), '")
-			.append(Predictions.Direction).append("' VARCHAR(255), '")
-			.append(Predictions.StopName).append("' VARCHAR(255), '")
-			.append(Predictions.StopID).append("' INTEGER, '")
-			.append(Predictions.Destination).append("' VARCHAR(255), '")
-			.append(Predictions.DistanceToStop).append("' INTEGER, '")
-			.append(Predictions.EstimatedTime).append("' INTEGER, '")
-			.append(Predictions.isDelayed).append("' INTEGER, '")
-			.append(Predictions.PredictionTime).append("' INTEGER, '")
-			.append(Predictions.Type).append("' VARCHAR(1), '")
-			.append(Predictions.VehicleID).append("' INTEGER, '")
-			.append(Predictions.Expiration).append("' INTEGER")
-			.append(");");
-			db.execSQL(str.toString());*/
 		}
 
 		@Override
@@ -335,7 +318,12 @@ public class AutolycusProvider extends ContentProvider {
 	}
 	
 	private Cursor fetchPreds(String system, String stpid, String route) {
-		MatrixCursor cur = new MatrixCursor(Predictions.getColumns);
+		//need some out of band communications....
+		MatrixCursor cur = new MatrixCursor(Predictions.getColumns) {
+			private Bundle mBundle = new Bundle();
+			@Override
+			public Bundle getExtras() { return mBundle; }
+		};
 		try {
 			ArrayList<Prediction> preds = BusTimeAPI.getPrediction(getContext(), system, stpid,route);
 			int i = 0;
@@ -356,9 +344,7 @@ public class AutolycusProvider extends ContentProvider {
 				row.add(pred.getPredTime().getTime());
 			}
 		} catch (Exception e) {
-			Log.e(TAG,e.toString() + " "+e.getStackTrace()[0].getFileName()
-					+ " "+e.getStackTrace()[0].getLineNumber());
-			return null;
+			cur.getExtras().putString(ERROR_MSG,e.getMessage());
 		}
 		return cur;
 	}

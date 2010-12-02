@@ -230,48 +230,47 @@ public final class BusTimeAPI {
 		ArrayList<Prediction> preds = new ArrayList<Prediction>();
 		Bundle params = new Bundle();
 		params.putString("stpid", stopID);
-		if(route != null) params.putString("rt", route);
+		if (route != null)
+			params.putString("rt", route);
 		PredictionBuilder curBuilder = new PredictionBuilder();
-		try {
-			XmlPullParser xpp = BusTimeAPI.loadData(context, "getpredictions",
-					system, params);
-			int eventType = xpp.getEventType();
-			String curTag = "";
-			while (eventType != XmlPullParser.END_DOCUMENT) {
-				switch (eventType) {
-				case XmlPullParser.START_TAG:
-					curTag = xpp.getName();
-					if (curTag.equals("prd")) { // on to new prediction
-						if(curBuilder.isSet()) {
-							preds.add(curBuilder.toPrediction());
-						}
-						curBuilder = new PredictionBuilder();
-					} else if (curTag.equals("error")) {
-						// err = new BusTimeError();
+		XmlPullParser xpp = BusTimeAPI.loadData(context, "getpredictions",
+				system, params);
+		int eventType = xpp.getEventType();
+		String curTag = "";
+		boolean errorFlag = false;
+		while (eventType != XmlPullParser.END_DOCUMENT) {
+			switch (eventType) {
+			case XmlPullParser.START_TAG:
+				curTag = xpp.getName();
+				if (curTag.equals("prd")) { // on to new prediction
+					if (curBuilder.isSet()) {
+						preds.add(curBuilder.toPrediction());
 					}
-					break;
-				case XmlPullParser.TEXT:
-					String text = xpp.getText().trim();
-					if (!curTag.equals("") && !text.equals("")) {
-						if (curBuilder != null)
-							curBuilder.setField(curTag, text);
-						else if (curTag.equals("error"))
-							throw new Exception(text);
-					}
-					break;
-				case XmlPullParser.END_TAG:
-					curTag = "";
-					break;
+					curBuilder = new PredictionBuilder();
+				} else if (curTag.equals("error")) {
+					errorFlag = true;
 				}
-				eventType = xpp.next(); // moving on....
+				break;
+			case XmlPullParser.TEXT:
+				String text = xpp.getText().trim();
+				if (!curTag.equals("") && !text.equals("")) {
+					if (errorFlag) {
+						if (curTag.equals("msg"))
+							throw new Exception(text);
+					} else
+						curBuilder.setField(curTag, text);
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				curTag = "";
+				break;
 			}
-
-			if(curBuilder.isSet()) preds.add(curBuilder.toPrediction());
-			return preds;
-		} catch (Exception ex) {
-			Log.e(TAG, ex.toString());
-			throw ex;
+			eventType = xpp.next(); // moving on....
 		}
+
+		if (curBuilder.isSet())
+			preds.add(curBuilder.toPrediction());
+		return preds;
 	}
 
 }

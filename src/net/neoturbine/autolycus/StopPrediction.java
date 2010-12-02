@@ -3,6 +3,8 @@ package net.neoturbine.autolycus;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import net.neoturbine.autolycus.providers.AutolycusProvider;
 import net.neoturbine.autolycus.providers.Predictions;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -67,7 +69,7 @@ public class StopPrediction extends ListActivity {
 			loadStop();
 		}
 	}
-	
+
 	@Override
 	public void onNewIntent(Intent i) {
 		super.onNewIntent(i);
@@ -91,7 +93,7 @@ public class StopPrediction extends ListActivity {
 		if (timer != null)
 			timer.shutdown();
 		timer = Executors.newScheduledThreadPool(1);
-		//ugly....
+		// ugly....
 		int delay = Integer.parseInt(PreferenceManager
 				.getDefaultSharedPreferences(this).getString("update_delay",
 						new Integer(Prefs.DEFAULT_UPDATE_DELAY).toString()));
@@ -149,6 +151,12 @@ public class StopPrediction extends ListActivity {
 			setProgressBarIndeterminateVisibility(false);
 
 			setListAdapter(null);
+
+			if (cur.getExtras().containsKey(AutolycusProvider.ERROR_MSG)) {
+				((TextView) findViewById(R.id.txt_stop_error)).setText(cur
+						.getExtras().getString(AutolycusProvider.ERROR_MSG));
+				return;
+			}
 			((TextView) findViewById(R.id.txt_stop_error)).setText("");
 
 			SimpleCursorAdapter adp = new SimpleCursorAdapter(
