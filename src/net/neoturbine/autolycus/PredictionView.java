@@ -49,7 +49,7 @@ public class PredictionView extends LinearLayout {
 		int predType = pred.getInt(pred.getColumnIndexOrThrow(Predictions.Type));
 		long predTime = pred.getLong(pred.getColumnIndexOrThrow(Predictions.PredictionTime));
 		String route = pred.getString(pred.getColumnIndexOrThrow(Predictions.RouteNumber));
-		String dir = pred.getString(pred.getColumnIndexOrThrow(Predictions.Direction));
+		String dest = pred.getString(pred.getColumnIndexOrThrow(Predictions.Destination));
 		if(Math.abs(System.currentTimeMillis() - estTime) < 60*1000) {
 			if(predType == PredictionBuilder.ARRIVAL_PREDICTION)
 				timeView.setText(formatter.format(estTime) +" - Arriving now!");
@@ -63,9 +63,9 @@ public class PredictionView extends LinearLayout {
 
 		predView.setText("Predicted: "+formatter.format(predTime));
 		if(stopinfo)
-			routeView.setText(route + " - "+dir);
+			routeView.setText(route + " - To "+dest);
 		else
-			routeView.setText("");
+			routeView.setText("To "+dest);
 	}
 	
 	public void setPrediction(Cursor pred, boolean showAllInfo) {
