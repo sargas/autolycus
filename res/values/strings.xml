@@ -13,5 +13,12 @@
 	<string name="prefs_delay_detail">Time in seconds (0 to disable)</string>
 	<string name="prefs_delay">Frequency of Prediction Updates</string>
 	
+	<!--  window titles -->
+	<string name="route_title">Select Route</string>
+	<string name="dir_title">Select Direction</string>
+	<string name="stop_title">Select Stop</string>
+	<string name="prediction_title">Bus Stop Arrival Times</string>
+	<string name="prefs_title">Autolycus Preferences</string>
+	<string name="shortcut_title">Create a Shortcut</string>
 	
 </resources>

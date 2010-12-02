@@ -42,6 +42,7 @@ public class SelectStop extends ListActivity  implements OnItemClickListener{
 			Intent dirintent = new Intent(Intent.ACTION_PICK,Directions.CONTENT_URI);
 			startActivityForResult(dirintent, PICK_DIRECTION);
 		}
+		this.getListView().setFastScrollEnabled(true);
 	}
 	
 	private void loadStops() {
