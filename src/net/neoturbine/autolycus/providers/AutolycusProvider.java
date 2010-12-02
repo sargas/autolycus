@@ -337,10 +337,9 @@ public class AutolycusProvider extends ContentProvider {
 	private Cursor fetchPreds(String system, String stpid, String route) {
 		MatrixCursor cur = new MatrixCursor(Predictions.getColumns);
 		try {
-			ArrayList<Prediction> preds = BusTimeAPI.getPrediction(getContext(), system, stpid);
+			ArrayList<Prediction> preds = BusTimeAPI.getPrediction(getContext(), system, stpid,route);
 			int i = 0;
 			for(Prediction pred : preds) {
-				if(route != null && !pred.getRoute().equals(route)) continue;
 				MatrixCursor.RowBuilder row = cur.newRow();
 				row.add(i++);
 				row.add(pred.getRoute());

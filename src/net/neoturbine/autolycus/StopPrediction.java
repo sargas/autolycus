@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.CheckBox;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -26,9 +27,9 @@ public class StopPrediction extends ListActivity {
 	private int stpid;
 	private String stpnm;
 
-	private ScheduledExecutorService timer;
+	private volatile ScheduledExecutorService timer;
 
-	private boolean limitRoute = false;
+	private boolean limitRoute = true;
 
 	/**
 	 * 
@@ -40,13 +41,20 @@ public class StopPrediction extends ListActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setProgressBarIndeterminateVisibility(true); // do this while loading ui
 
+		setContentView(R.layout.stop_predictions);
+		
+		findViewById(R.id.predictions_showall).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				limitRoute = !(((CheckBox)v).isChecked());
+				updatePredictions();
+			}
+		});
 		loadIntent();
 	}
 
 	private void loadIntent() {
 		final Intent intent = getIntent();
-
-		setContentView(R.layout.stop_predictions);
 
 		if (intent.getAction().equals(OPEN_STOP_ACTION)) {
 			system = intent.getStringExtra(SelectStop.EXTRA_SYSTEM);
@@ -154,8 +162,7 @@ public class StopPrediction extends ListActivity {
 	
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
-		case R.id.prediction_showall:
-			limitRoute = !limitRoute;
+		case R.id.prediction_update:
 			updatePredictions();
 			return true;
 		}

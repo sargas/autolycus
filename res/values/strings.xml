@@ -5,5 +5,6 @@
 	<string name="shortcut_stopnamehint">This will appear on the home screen.</string>
 	<string name="shortcut_submit">Create Shortcut</string>
 	<string name="no_arrival">No arrival times available.</string>
-	<string name="menu_showall">Show All</string>
+	<string name="prediction_showall_toggle">Show all routes at this stop</string>
+	<string name="menu_update">Update Now</string>
 </resources>

@@ -226,10 +226,11 @@ public final class BusTimeAPI {
 	}
 
 	public static ArrayList<Prediction> getPrediction(Context context,
-			String system, String stopID) throws Exception {
+			String system, String stopID, String route) throws Exception {
 		ArrayList<Prediction> preds = new ArrayList<Prediction>();
 		Bundle params = new Bundle();
 		params.putString("stpid", stopID);
+		if(route != null) params.putString("rt", route);
 		PredictionBuilder curBuilder = new PredictionBuilder();
 		try {
 			XmlPullParser xpp = BusTimeAPI.loadData(context, "getpredictions",
