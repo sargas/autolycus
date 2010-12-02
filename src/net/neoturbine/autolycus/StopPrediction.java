@@ -67,6 +67,13 @@ public class StopPrediction extends ListActivity {
 			loadStop();
 		}
 	}
+	
+	@Override
+	public void onNewIntent(Intent i) {
+		super.onNewIntent(i);
+		setIntent(i);
+		loadIntent();
+	}
 
 	private void loadStop() {
 		TextView titleView = (TextView) findViewById(R.id.txt_stop_name);

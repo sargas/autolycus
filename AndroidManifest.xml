@@ -33,7 +33,7 @@
 				<data android:mimeType="vnd.android.cursor.dir/vnd.autolycus.stops" />
 			</intent-filter>
 		</activity>
-		<activity android:name="StopPrediction">
+		<activity android:name="StopPrediction" android:launchMode="singleTask">
 			<intent-filter>
 				<action android:name="net.neoturbine.autolycus.openstop" />
 				<category android:name="android.intent.category.DEFAULT" />
