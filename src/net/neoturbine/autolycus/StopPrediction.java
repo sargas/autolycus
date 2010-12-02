@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,14 +43,15 @@ public class StopPrediction extends ListActivity {
 		setProgressBarIndeterminateVisibility(true); // do this while loading ui
 
 		setContentView(R.layout.stop_predictions);
-		
-		findViewById(R.id.predictions_showall).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				limitRoute = !(((CheckBox)v).isChecked());
-				updatePredictions();
-			}
-		});
+
+		findViewById(R.id.predictions_showall).setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						limitRoute = !(((CheckBox) v).isChecked());
+						updatePredictions();
+					}
+				});
 		loadIntent();
 	}
 
@@ -82,18 +84,29 @@ public class StopPrediction extends ListActivity {
 		if (timer != null)
 			timer.shutdown();
 		timer = Executors.newScheduledThreadPool(1);
+		//ugly....
+		int delay = Integer.parseInt(PreferenceManager
+				.getDefaultSharedPreferences(this).getString("update_delay",
+						new Integer(Prefs.DEFAULT_UPDATE_DELAY).toString()));
 
-		// very very very ugly. asynctask must be run from UI thread
-		timer.scheduleWithFixedDelay(new Runnable() {
-			@Override
-			public void run() {
-				StopPrediction.this.runOnUiThread(new Runnable() {
-					public void run() {
-						new UpdatePredictionsTask().execute();
-					}
-				});
-			}
-		}, 0, 60, TimeUnit.SECONDS);
+		if (delay == 0) {
+			runOnUiThread(new Runnable() {
+				public void run() {
+					new UpdatePredictionsTask().execute();
+				}
+			});
+		} else
+			// very very very ugly. asynctask must be run from UI thread
+			timer.scheduleWithFixedDelay(new Runnable() {
+				@Override
+				public void run() {
+					runOnUiThread(new Runnable() {
+						public void run() {
+							new UpdatePredictionsTask().execute();
+						}
+					});
+				}
+			}, 0, delay, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -153,17 +166,20 @@ public class StopPrediction extends ListActivity {
 						.setText(R.string.no_arrival);
 		}
 	}
-	
+
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.prediction, menu);
 		return true;
 	}
-	
+
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch(item.getItemId()) {
+		switch (item.getItemId()) {
 		case R.id.prediction_update:
 			updatePredictions();
+			return true;
+		case R.id.prediction_prefs:
+			startActivity(new Intent(this, Prefs.class));
 			return true;
 		}
 		return false;

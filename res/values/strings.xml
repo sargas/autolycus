@@ -6,5 +6,12 @@
 	<string name="shortcut_submit">Create Shortcut</string>
 	<string name="no_arrival">No arrival times available.</string>
 	<string name="prediction_showall_toggle">Show all routes at this stop</string>
+	
+	<string name="menu_prefs">Settings</string>
 	<string name="menu_update">Update Now</string>
+	
+	<string name="prefs_delay_detail">Time in seconds (0 to disable)</string>
+	<string name="prefs_delay">Frequency of Prediction Updates</string>
+	
+	
 </resources>
