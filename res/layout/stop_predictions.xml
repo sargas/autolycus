@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 	<TextView android:id="@+id/txt_stop_name"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:gravity="center_horizontal" android:layout_centerInParent="true"
+		android:layout_alignParentTop="true" android:gravity="center_horizontal"
 		android:textAppearance="?android:attr/textAppearanceLarge" />
-	<TextView android:id="@+id/txt_stop_dir" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:gravity="center_horizontal"
-		android:layout_centerInParent="true" android:textAppearance="?android:attr/textAppearanceLarge" />
+	<TextView android:id="@+id/txt_stop_dir" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_below="@+id/txt_stop_name"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+	    android:layout_alignParentLeft="true" />
+	<TextView android:id="@+id/txt_stop_predtime" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_below="@+id/txt_stop_name"
+		android:textAppearance="?android:attr/textAppearanceSmall"
+	    android:layout_alignParentRight="true" 
+	    android:layout_alignBaseline="@+id/txt_stop_dir" />
 	<CheckBox android:id="@+id/predictions_showall" android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:text="@string/prediction_showall_toggle" />
+		android:text="@string/prediction_showall_toggle" 
+		android:layout_below="@+id/txt_stop_dir" />
 	<ListView android:id="@id/android:list" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" />
+		android:layout_height="wrap_content" android:layout_below="@+id/predictions_showall" />
 	<TextView android:id="@+id/txt_stop_error"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:gravity="center_horizontal" android:layout_centerInParent="true"
-		android:textAppearance="?android:attr/textAppearanceMedium" />
-</LinearLayout>
+		android:layout_centerHorizontal="true" android:layout_below="@+id/predictions_showall"
+		android:textAppearance="?android:attr/textAppearanceMedium" 
+		android:gravity="center_horizontal" />
+</RelativeLayout>

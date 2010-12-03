@@ -19,9 +19,8 @@ public class PredictionView extends LinearLayout {
 	private TextView routeView; //for verbosity
 	
 	private TextView timeView;
-	private TextView predView;
 	
-	private static final SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
+	public static final SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
 
 
 	public PredictionView(Context context, Cursor pred) {
@@ -41,13 +40,11 @@ public class PredictionView extends LinearLayout {
 		
 		timeView = (TextView)rellayout.findViewById(R.id.predictionview_timeview);
 		routeView = (TextView)rellayout.findViewById(R.id.predictionview_routeview);
-		predView = (TextView)rellayout.findViewById(R.id.predictionview_predview);
 	}
 	
 	public void resetLabels() {
 		long estTime = pred.getLong(pred.getColumnIndexOrThrow(Predictions.EstimatedTime));
 		int predType = pred.getInt(pred.getColumnIndexOrThrow(Predictions.Type));
-		long predTime = pred.getLong(pred.getColumnIndexOrThrow(Predictions.PredictionTime));
 		String route = pred.getString(pred.getColumnIndexOrThrow(Predictions.RouteNumber));
 		String dest = pred.getString(pred.getColumnIndexOrThrow(Predictions.Destination));
 		if(Math.abs(System.currentTimeMillis() - estTime) < 60*1000) {
@@ -61,7 +58,6 @@ public class PredictionView extends LinearLayout {
 							System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, 0));
 		}
 
-		predView.setText("Predicted: "+formatter.format(predTime));
 		if(stopinfo)
 			routeView.setText(route + " - To "+dest);
 		else

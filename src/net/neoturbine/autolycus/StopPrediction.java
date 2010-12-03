@@ -174,9 +174,14 @@ public class StopPrediction extends ListActivity {
 				}
 			});
 
-			if (cur.getCount() != 0)
+			if (cur.getCount() != 0) {
+				cur.moveToFirst();
+				((TextView) findViewById(R.id.txt_stop_predtime))
+						.setText("Predicted: "
+								+ PredictionView.formatter.format(cur.getLong(cur
+										.getColumnIndexOrThrow(Predictions.PredictionTime))));
 				setListAdapter(adp);
-			else
+			} else
 				((TextView) findViewById(R.id.txt_stop_error))
 						.setText(R.string.no_arrival);
 		}

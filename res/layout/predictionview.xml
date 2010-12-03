@@ -19,12 +19,4 @@
    android:layout_alignLeft="@+id/predictionview_timeview"
    android:id="@+id/predictionview_routeview"
    android:text="route" />
-   
-  <TextView
-   android:layout_width="wrap_content"
-   android:layout_height="wrap_content"
-   android:layout_below="@+id/predictionview_timeview"
-   android:layout_alignRight="@+id/predictionview_timeview"
-   android:id="@+id/predictionview_predview"
-   android:text="pred time"  />
 </RelativeLayout>
