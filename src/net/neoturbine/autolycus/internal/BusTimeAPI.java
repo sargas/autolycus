@@ -36,7 +36,6 @@ public final class BusTimeAPI {
 	public static XmlPullParser loadData(Context context, String verb,
 			String system, Bundle params) throws ClientProtocolException,
 			IOException, XmlPullParserException {
-		// TODO: check if online (or airplane mode, or something)
 		ArrayList<NameValuePair> qparams = new ArrayList<NameValuePair>();
 		if (params != null) {
 			for (String name : params.keySet()) {
@@ -197,11 +196,11 @@ public final class BusTimeAPI {
 				curTag = xpp.getName();
 				if (curTag.equals("stop")) { // on to new route
 					if (curBuilder.getName() != null) { // finished a route
-						curBuilder.setRoute(route);
-						curBuilder.setDir(direction);
 						stops.add(curBuilder.toStopInfo());
 					}
 					curBuilder = new StopInfoBuilder(system);
+					curBuilder.setRoute(route);
+					curBuilder.setDir(direction);
 				} else if (curTag.equals("error"))
 					err = new BusTimeError();
 				break;
@@ -223,6 +222,9 @@ public final class BusTimeAPI {
 
 		if (err != null)
 			throw err;
+		
+		if(curBuilder.getName() != null)
+			stops.add(curBuilder.toStopInfo());
 
 		return stops;
 	}
