@@ -3,20 +3,23 @@ package net.neoturbine.autolycus;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
 import net.neoturbine.autolycus.providers.AutolycusProvider;
 import net.neoturbine.autolycus.providers.Predictions;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CheckBox;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -178,21 +181,24 @@ public class StopPrediction extends ListActivity {
 				cur.moveToFirst();
 				((TextView) findViewById(R.id.txt_stop_predtime))
 						.setText("Predicted: "
-								+ PredictionView.formatter.format(cur.getLong(cur
+								+ PredictionView.prettyTime(cur.getLong(cur
 										.getColumnIndexOrThrow(Predictions.PredictionTime))));
 				setListAdapter(adp);
+				registerForContextMenu(getListView());
 			} else
 				((TextView) findViewById(R.id.txt_stop_error))
 						.setText(R.string.no_arrival);
 		}
 	}
 
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.prediction, menu);
 		return true;
 	}
 
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.prediction_update:
@@ -201,6 +207,70 @@ public class StopPrediction extends ListActivity {
 		case R.id.prediction_prefs:
 			startActivity(new Intent(this, Prefs.class));
 			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.prediction_context, menu);
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+				.getMenuInfo();
+		switch (item.getItemId()) {
+		case R.id.prediction_details:
+			Cursor c = (Cursor) getListAdapter().getItem(info.position);
+
+			Dialog dialog = new Dialog(this);
+			dialog.setContentView(R.layout.prediction_detail);
+			dialog.setTitle("Details");
+
+			((TextView) dialog.findViewById(R.id.prediction_detail_sys))
+					.setText(c.getString(c
+							.getColumnIndexOrThrow(Predictions.System)));
+			((TextView) dialog.findViewById(R.id.prediction_detail_rt))
+					.setText(c.getString(c
+							.getColumnIndexOrThrow(Predictions.RouteNumber)));
+			((TextView) dialog.findViewById(R.id.prediction_detail_dir))
+					.setText(c.getString(c
+							.getColumnIndexOrThrow(Predictions.Direction)));
+			((TextView) dialog.findViewById(R.id.prediction_detail_des))
+					.setText(c.getString(c
+							.getColumnIndexOrThrow(Predictions.Destination)));
+			((TextView) dialog.findViewById(R.id.prediction_detail_type))
+					.setText(Predictions.typeToString(c.getString(c
+							.getColumnIndexOrThrow(Predictions.Type))));
+			((TextView) dialog.findViewById(R.id.prediction_detail_stpid))
+					.setText(c.getString(c
+							.getColumnIndexOrThrow(Predictions.StopID)));
+			((TextView) dialog.findViewById(R.id.prediction_detail_stpnm))
+					.setText(c.getString(c
+							.getColumnIndexOrThrow(Predictions.StopName)));
+			((TextView) dialog.findViewById(R.id.prediction_detail_dist))
+					.setText(c.getString(c
+							.getColumnIndexOrThrow(Predictions.DistanceToStop)));
+			((TextView) dialog.findViewById(R.id.prediction_detail_delayed))
+					.setText(c.getString(c
+							.getColumnIndexOrThrow(Predictions.isDelayed)));
+			((TextView) dialog.findViewById(R.id.prediction_detail_vid))
+					.setText(c.getString(c
+							.getColumnIndexOrThrow(Predictions.VehicleID)));
+			((TextView) dialog.findViewById(R.id.prediction_detail_esttime))
+					.setText(PredictionView.prettyTime(c.getLong(c
+							.getColumnIndexOrThrow(Predictions.EstimatedTime))));
+			((TextView) dialog.findViewById(R.id.prediction_detail_predtime))
+					.setText(PredictionView.prettyTime(c.getLong(c
+							.getColumnIndexOrThrow(Predictions.PredictionTime))));
+
+			dialog.setOwnerActivity(this);
+			dialog.show();
+
 		}
 		return false;
 	}

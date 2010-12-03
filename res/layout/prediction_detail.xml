@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+	<TableRow>
+		<TextView android:layout_column="1" android:text="System"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_sys" android:gravity="right"
+			android:padding="3dip" />
+	</TableRow>
+
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Route"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_rt" android:gravity="right"
+			android:padding="3dip" />
+	</TableRow>
+
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Direction"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_dir" android:gravity="right"
+			android:padding="3dip" />
+	</TableRow>
+	
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Destination"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_des" android:gravity="right"
+			android:padding="3dip" />
+	</TableRow>
+	
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Type"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_type" android:gravity="right"
+			android:padding="3dip" />	
+	</TableRow>
+	
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Stop ID"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_stpid" android:gravity="right"
+			android:padding="3dip" />	
+	</TableRow>
+	
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Stop Name"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_stpnm" android:gravity="right"
+			android:padding="3dip" />	
+	</TableRow>
+	
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Distance to Stop (ft)"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_dist" android:gravity="right"
+			android:padding="3dip" />	
+	</TableRow>
+	
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Delayed"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_delayed" android:gravity="right"
+			android:padding="3dip" />	
+	</TableRow>
+	
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Vehicle ID"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_vid" android:gravity="right"
+			android:padding="3dip" />	
+	</TableRow>
+	
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Estimated Time"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_esttime" android:gravity="right"
+			android:padding="3dip" />	
+	</TableRow>
+	
+	<TableRow>
+		<TextView android:layout_column="1" android:text="Prediction Time"
+			android:padding="3dip" />
+		<TextView android:id="@+id/prediction_detail_predtime" android:gravity="right"
+			android:padding="3dip" />
+	</TableRow>
+
+</TableLayout>

@@ -9,6 +9,7 @@
 	
 	<string name="menu_prefs">Settings</string>
 	<string name="menu_update">Update Now</string>
+	<string name="menu_details">Details</string>
 	
 	<string name="prefs_delay_detail">Time in seconds (0 to disable)</string>
 	<string name="prefs_delay">Frequency of Prediction Updates</string>

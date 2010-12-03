@@ -20,7 +20,7 @@ public class PredictionView extends LinearLayout {
 	
 	private TextView timeView;
 	
-	public static final SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
+	private static final SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
 
 
 	public PredictionView(Context context, Cursor pred) {
@@ -49,11 +49,11 @@ public class PredictionView extends LinearLayout {
 		String dest = pred.getString(pred.getColumnIndexOrThrow(Predictions.Destination));
 		if(Math.abs(System.currentTimeMillis() - estTime) < 60*1000) {
 			if(predType == PredictionBuilder.ARRIVAL_PREDICTION)
-				timeView.setText(formatter.format(estTime) +" - Arriving now!");
+				timeView.setText(prettyTime(estTime) +" - Arriving now!");
 			else //departure
-				timeView.setText(formatter.format(estTime) +" - Departing now!");
+				timeView.setText(prettyTime(estTime) +" - Departing now!");
 		} else { //more then a minute left		
-			timeView.setText(formatter.format(estTime) +" - "+
+			timeView.setText(prettyTime(estTime) +" - "+
 					DateUtils.getRelativeTimeSpanString(estTime,
 							System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, 0));
 		}
@@ -68,6 +68,10 @@ public class PredictionView extends LinearLayout {
 		this.pred = pred;
 		this.stopinfo = showAllInfo;
 		resetLabels();
+	}
+	
+	public static String prettyTime(long time) {
+		return formatter.format(time);
 	}
 
 }

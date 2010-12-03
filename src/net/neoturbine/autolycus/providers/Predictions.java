@@ -3,6 +3,7 @@
  */
 package net.neoturbine.autolycus.providers;
 
+import net.neoturbine.autolycus.internal.Prediction;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -39,5 +40,13 @@ public class Predictions implements BaseColumns {
 	public static final String[] getColumns = { _ID, RouteNumber, System,
 			Direction, StopID, StopName, VehicleID, DistanceToStop, isDelayed,
 			Destination, Type, EstimatedTime, PredictionTime };
+	
+	public static String typeToString(String type) {
+		if(type.equals(Integer.toString(Prediction.ARRIVAL_PREDICTION)))
+				return "Arrival";
+		else if (type.equals(Integer.toString(Prediction.DEPARTURE_PREDICTION)))
+				return "Departure";
+		return null;
+	}
 
 }
