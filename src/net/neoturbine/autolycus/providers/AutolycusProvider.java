@@ -220,7 +220,8 @@ public class AutolycusProvider extends ContentProvider {
 				// selection should be
 				// 'system=? stpid=? [route=?]'
 				return fetchPreds(selectionArgs[0], selectionArgs[1],
-						selectionArgs.length == 2 ? null : selectionArgs[2]);
+						selectionArgs.length < 3 ? null : selectionArgs[2],
+						selectionArgs.length < 4 ? null : selectionArgs[3]);
 			default:
 				throw new IllegalArgumentException("Unknown URI " + uri);
 			}
@@ -360,7 +361,7 @@ public class AutolycusProvider extends ContentProvider {
 		}
 	}
 
-	private Cursor fetchPreds(String system, String stpid, String route) {
+	private Cursor fetchPreds(String system, String stpid, String route, String dir) {
 		// need some out of band communications....
 		MatrixCursor cur = new MatrixCursor(Predictions.getColumns) {
 			private Bundle mBundle = new Bundle();
@@ -375,6 +376,7 @@ public class AutolycusProvider extends ContentProvider {
 					getContext(), system, stpid, route);
 			int i = 0;
 			for (Prediction pred : preds) {
+				if(dir != null) if(!pred.getDirection().equals(dir)) continue;
 				MatrixCursor.RowBuilder row = cur.newRow();
 				row.add(i++);
 				row.add(pred.getRoute());

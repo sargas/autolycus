@@ -149,8 +149,9 @@ public class StopPrediction extends ListActivity {
 				return managedQuery(Predictions.CONTENT_URI,
 						Predictions.getColumns, Predictions.System + "=? AND "
 								+ Predictions.StopID + "=? AND "
-								+ Predictions.RouteNumber + "=?", new String[] {
-								system, Integer.toString(stpid), route }, null);
+								+ Predictions.RouteNumber + "=? AND "
+								+ Predictions.Direction + "=?", new String[] {
+								system, Integer.toString(stpid), route , direction}, null);
 		}
 
 		@Override
