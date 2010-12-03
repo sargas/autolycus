@@ -1,5 +1,6 @@
 package net.neoturbine.autolycus;
 
+import net.neoturbine.autolycus.providers.AutolycusProvider;
 import net.neoturbine.autolycus.providers.Directions;
 import net.neoturbine.autolycus.providers.Routes;
 import android.app.ListActivity;
@@ -11,9 +12,11 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.SimpleCursorAdapter;
 
-public class SelectDirection extends ListActivity implements OnItemClickListener {
+public class SelectDirection extends ListActivity implements
+		OnItemClickListener {
 	public static final String SELECT_DIRECTION = "net.neoturbine.autolycus.SELECT_DIRECTION";
 	public static final String EXTRA_RT = "net.neoturbine.autolycus.SelectDirection.ROUTE";
 	public static final String EXTRA_SYS = "net.neoturbine.autolycus.SelectDirection.SYSTEM";
@@ -21,8 +24,8 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 
 	private static final int PICK_ROUTE = 2;
 
-	//private ArrayList<String> directions;
-	//private Route route;
+	// private ArrayList<String> directions;
+	// private Route route;
 	private String rt;
 	private String system;
 
@@ -30,14 +33,15 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setProgressBarIndeterminateVisibility(true);
-		
+
 		final Intent intent = getIntent();
 
-		if(intent.getAction().equals(Intent.ACTION_PICK)) {
-			Intent routeintent = new Intent(Intent.ACTION_PICK,Routes.CONTENT_URI);
+		if (intent.getAction().equals(Intent.ACTION_PICK)) {
+			Intent routeintent = new Intent(Intent.ACTION_PICK,
+					Routes.CONTENT_URI);
 			startActivityForResult(routeintent, PICK_ROUTE);
 		}
 	}
@@ -50,25 +54,38 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 			protected void onPreExecute() {
 				setProgressBarIndeterminateVisibility(true);
 			}
+
 			@Override
 			protected Cursor doInBackground(Void... params) {
-				final String[] PROJECTION = new String[] {
-						Directions._ID, Directions.Direction
-				};
+				final String[] PROJECTION = new String[] { Directions._ID,
+						Directions.Direction };
 				return managedQuery(Directions.CONTENT_URI, PROJECTION,
-						Directions.System+"=? AND "+
-						Directions.RouteNumber+"=?",
-						new String[] {system, rt} , null);
+						Directions.System + "=? AND " + Directions.RouteNumber
+								+ "=?", new String[] { system, rt }, null);
 			}
+
 			@Override
 			protected void onPostExecute(Cursor result) {
 				setProgressBarIndeterminateVisibility(false);
-				if(getListAdapter() != null) {
-					((SimpleCursorAdapter)getListAdapter()).changeCursor(result);
-				} else {
-					setListAdapter(new SimpleCursorAdapter(SelectDirection.this,
+
+				if (result.getExtras().containsKey(AutolycusProvider.ERROR_MSG)) {
+					setListAdapter(new ArrayAdapter<String>(
+							SelectDirection.this,
 							android.R.layout.simple_list_item_1,
-							result,
+							android.R.id.text1,
+							new String[] { result.getExtras().getString(
+									AutolycusProvider.ERROR_MSG) }));
+					return;
+				}
+				
+				if (getListAdapter() != null
+						&& getListAdapter().getClass() != ArrayAdapter.class) {
+					((SimpleCursorAdapter) getListAdapter())
+							.changeCursor(result);
+				} else {
+					setListAdapter(new SimpleCursorAdapter(
+							SelectDirection.this,
+							android.R.layout.simple_list_item_1, result,
 							new String[] { Directions.Direction },
 							new int[] { android.R.id.text1 }));
 				}
@@ -77,14 +94,14 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 	}
 
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-		if(position >= 0) {
+		if (position >= 0) {
 			final Cursor c = (Cursor) parent.getItemAtPosition(position);
-			final String dir = c.getString(c.getColumnIndexOrThrow(Directions.Direction));
-			setResult(RESULT_OK,getStop(dir));
+			final String dir = c.getString(c
+					.getColumnIndexOrThrow(Directions.Direction));
+			setResult(RESULT_OK, getStop(dir));
 			finish();
 		}
-	}    
-
+	}
 
 	protected Intent getStop(String direction) {
 		Intent forStop = new Intent();
@@ -99,7 +116,7 @@ public class SelectDirection extends ListActivity implements OnItemClickListener
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == PICK_ROUTE) {
-			if(resultCode == RESULT_OK) {
+			if (resultCode == RESULT_OK) {
 				rt = data.getStringExtra(EXTRA_RT);
 				system = data.getStringExtra(EXTRA_SYS);
 				loadDirections();

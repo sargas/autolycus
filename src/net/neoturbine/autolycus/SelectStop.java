@@ -1,5 +1,6 @@
 package net.neoturbine.autolycus;
 
+import net.neoturbine.autolycus.providers.AutolycusProvider;
 import net.neoturbine.autolycus.providers.Directions;
 import net.neoturbine.autolycus.providers.Stops;
 import android.app.ListActivity;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -67,7 +69,19 @@ public class SelectStop extends ListActivity  implements OnItemClickListener{
 			@Override
 			protected void onPostExecute(Cursor result) {
 				setProgressBarIndeterminateVisibility(false);
-				if(getListAdapter() != null) {
+				
+				if (result.getExtras().containsKey(AutolycusProvider.ERROR_MSG)) {
+					setListAdapter(new ArrayAdapter<String>(
+							SelectStop.this,
+							android.R.layout.simple_list_item_1,
+							android.R.id.text1,
+							new String[] { result.getExtras().getString(
+									AutolycusProvider.ERROR_MSG) }));
+					return;
+				}
+				
+				if(getListAdapter() != null
+						&& getListAdapter().getClass() != ArrayAdapter.class) {
 					((SimpleCursorAdapter)getListAdapter()).changeCursor(result);
 				} else {
 					setListAdapter(new SimpleCursorAdapter(SelectStop.this,

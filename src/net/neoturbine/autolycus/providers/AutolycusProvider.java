@@ -26,7 +26,7 @@ import android.util.Log;
 
 /**
  * @author Joseph Booker
- *
+ * 
  */
 public class AutolycusProvider extends ContentProvider {
 	private static final String TAG = "Autolycus";
@@ -53,28 +53,32 @@ public class AutolycusProvider extends ContentProvider {
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 		DatabaseHelper(Context context) {
-			super(context,DATABASE_NAME,null,DATABASE_VERSION);
+			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		}
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			//TODO (potentially): convert to specialized methods in SQLiteDatabase
+			// TODO (potentially): convert to specialized methods in
+			// SQLiteDatabase
 			StringBuilder str = new StringBuilder();
-			str.append("CREATE TABLE ").append(Routes.TABLE_NAME)
-			.append(" ('").append(Routes._ID).append("' INTEGER PRIMARY KEY AUTOINCREMENT, '")
-			.append(Routes.System).append("' VARCHAR(255), '")
-			.append(Routes.Expiration).append("' INTEGER, '")
-			.append(Routes.RouteNumber).append("' VARCHAR(255) UNIQUE, '")
-			.append(Routes.RouteName).append("' VARCHAR(255) UNIQUE")
-			.append(");");
+			str.append("CREATE TABLE ").append(Routes.TABLE_NAME).append(" ('")
+					.append(Routes._ID)
+					.append("' INTEGER PRIMARY KEY AUTOINCREMENT, '")
+					.append(Routes.System).append("' VARCHAR(255), '")
+					.append(Routes.Expiration).append("' INTEGER, '")
+					.append(Routes.RouteNumber)
+					.append("' VARCHAR(255) UNIQUE, '")
+					.append(Routes.RouteName).append("' VARCHAR(255) UNIQUE")
+					.append(");");
 			db.execSQL(str.toString());
 
 			str = new StringBuilder();
-			str.append("CREATE TABLE ").append(Systems.TABLE_NAME)
-			.append(" (").append(Systems._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
-			.append(Systems.Name).append("' VARCHAR(255) UNIQUE, '")
-			.append(Systems.Abbrivation).append("' VARCHAR(255) UNIQUE")
-			.append(");");
+			str.append("CREATE TABLE ").append(Systems.TABLE_NAME).append(" (")
+					.append(Systems._ID)
+					.append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
+					.append(Systems.Name).append("' VARCHAR(255) UNIQUE, '")
+					.append(Systems.Abbrivation)
+					.append("' VARCHAR(255) UNIQUE").append(");");
 			db.execSQL(str.toString());
 
 			ContentValues cta = new ContentValues();
@@ -86,57 +90,63 @@ public class AutolycusProvider extends ContentProvider {
 			trip.put(Systems.Name, "Ohio State University TRIP");
 			trip.put(Systems.Abbrivation, "OSU TRIP");
 			db.insert(Systems.TABLE_NAME, null, trip);
-			
+
 			str = new StringBuilder();
 			str.append("CREATE TABLE ").append(Directions.TABLE_NAME)
-			.append(" (").append(Directions._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
-			.append(Directions.System).append("' VARCHAR(255), '")
-			.append(Directions.RouteNumber).append("' VARCHAR(255), '")
-			.append(Directions.Direction).append("' VARCHAR(255), '")
-			.append(Directions.Expiration).append("' INTEGER")
-			.append(");");
+					.append(" (").append(Directions._ID)
+					.append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
+					.append(Directions.System).append("' VARCHAR(255), '")
+					.append(Directions.RouteNumber).append("' VARCHAR(255), '")
+					.append(Directions.Direction).append("' VARCHAR(255), '")
+					.append(Directions.Expiration).append("' INTEGER")
+					.append(");");
 			db.execSQL(str.toString());
-			
+
 			str = new StringBuilder();
-			str.append("CREATE TABLE ").append(Stops.TABLE_NAME)
-			.append(" (").append(Stops._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
-			.append(Stops.System).append("' VARCHAR(255), '")
-			.append(Stops.RouteNumber).append("' VARCHAR(255), '")
-			.append(Stops.Direction).append("' VARCHAR(255), '")
-			.append(Stops.Name).append("' VARCHAR(255), '")
-			.append(Stops.StopID).append("' INTEGER, '")
-			.append(Stops.Longitude).append("' REAL, '")
-			.append(Stops.Latitude).append("' REAL, '")
-			.append(Stops.Expiration).append("' INTEGER")
-			.append(");");
+			str.append("CREATE TABLE ").append(Stops.TABLE_NAME).append(" (")
+					.append(Stops._ID)
+					.append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
+					.append(Stops.System).append("' VARCHAR(255), '")
+					.append(Stops.RouteNumber).append("' VARCHAR(255), '")
+					.append(Stops.Direction).append("' VARCHAR(255), '")
+					.append(Stops.Name).append("' VARCHAR(255), '")
+					.append(Stops.StopID).append("' INTEGER, '")
+					.append(Stops.Longitude).append("' REAL, '")
+					.append(Stops.Latitude).append("' REAL, '")
+					.append(Stops.Expiration).append("' INTEGER").append(");");
 			db.execSQL(str.toString());
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
-					+ ", which will destroy all old data");
+			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+					+ newVersion + ", which will destroy all old data");
 			onCreate(db);
 		}
 	}
+
 	private DatabaseHelper dbHelper;
 
-
-	/* (non-Javadoc)
-	 * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.ContentProvider#delete(android.net.Uri,
+	 * java.lang.String, java.lang.String[])
 	 */
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		//nope
+		// nope
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.content.ContentProvider#getType(android.net.Uri)
 	 */
 	@Override
 	public String getType(Uri uri) {
-		switch(uriMatcher.match(uri)) {
+		switch (uriMatcher.match(uri)) {
 		case URI_ROUTES:
 			return Routes.CONTENT_TYPE;
 		case URI_SYSTEMS:
@@ -152,15 +162,20 @@ public class AutolycusProvider extends ContentProvider {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.ContentProvider#insert(android.net.Uri,
+	 * android.content.ContentValues)
 	 */
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.content.ContentProvider#onCreate()
 	 */
 	@Override
@@ -169,65 +184,85 @@ public class AutolycusProvider extends ContentProvider {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see android.content.ContentProvider#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.ContentProvider#query(android.net.Uri,
+	 * java.lang.String[], java.lang.String, java.lang.String[],
+	 * java.lang.String)
 	 */
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
 		final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-		switch(uriMatcher.match(uri)) {
-		case URI_ROUTES:
-			qb.setTables(Routes.TABLE_NAME);
-			//selection should be 'system=?'
-			fetchRoutes(selectionArgs[0]);
-			break;
-		case URI_SYSTEMS:
-			qb.setTables(Systems.TABLE_NAME);
-			break;
-		case URI_DIRECTIONS:
-			qb.setTables(Directions.TABLE_NAME);
-			//selection should be 'system=? AND rt=?'
-			fetchDirections(selectionArgs[0],selectionArgs[1]);
-			break;
-		case URI_STOPS:
-			qb.setTables(Stops.TABLE_NAME);
-			//selection should be 'system=? rt=? dir=?'
-			fetchStops(selectionArgs[0],selectionArgs[1],selectionArgs[2]);
-			break;
-		case URI_PREDICTIONS:
-			//selection should be
-			//'system=? stpid=? [route=?]'
-			return fetchPreds(selectionArgs[0],selectionArgs[1],
-					selectionArgs.length==2?null:selectionArgs[2]);
-		default:
-			throw new IllegalArgumentException("Unknown URI " + uri);
+		try {
+			switch (uriMatcher.match(uri)) {
+			case URI_ROUTES:
+				qb.setTables(Routes.TABLE_NAME);
+				// selection should be 'system=?'
+				fetchRoutes(selectionArgs[0]);
+				break;
+			case URI_SYSTEMS:
+				qb.setTables(Systems.TABLE_NAME);
+				break;
+			case URI_DIRECTIONS:
+				qb.setTables(Directions.TABLE_NAME);
+				// selection should be 'system=? AND rt=?'
+				fetchDirections(selectionArgs[0], selectionArgs[1]);
+				break;
+			case URI_STOPS:
+				qb.setTables(Stops.TABLE_NAME);
+				// selection should be 'system=? rt=? dir=?'
+				fetchStops(selectionArgs[0], selectionArgs[1], selectionArgs[2]);
+				break;
+			case URI_PREDICTIONS:
+				// selection should be
+				// 'system=? stpid=? [route=?]'
+				return fetchPreds(selectionArgs[0], selectionArgs[1],
+						selectionArgs.length == 2 ? null : selectionArgs[2]);
+			default:
+				throw new IllegalArgumentException("Unknown URI " + uri);
+			}
+			final SQLiteDatabase db = dbHelper.getReadableDatabase();
+			final Cursor c = qb.query(db, projection, selection, selectionArgs,
+					null, null, sortOrder);
+			c.setNotificationUri(getContext().getContentResolver(), uri);
+			return c;
+		} catch (NetworkRetrivalFailed e) {
+			Cursor c = new MatrixCursor(new String[] {"_ID"}) {
+				private Bundle mBundle = new Bundle();
+
+				@Override
+				public Bundle getExtras() {
+					return mBundle;
+				}
+			};
+			c.getExtras().putString(ERROR_MSG, e.getMessage());
+			return c;
 		}
-		final SQLiteDatabase db = dbHelper.getReadableDatabase();
-		final Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, sortOrder);
-		c.setNotificationUri(getContext().getContentResolver(), uri);
-		return c;
 	}
 
-	private void fetchRoutes(String system) {
+	private void fetchRoutes(String system) throws NetworkRetrivalFailed {
 		final SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try {
 			final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 			qb.setTables(Routes.TABLE_NAME);
 			/* don't query unless I am the only one querying/inserting */
-			synchronized(this) {
-				final Cursor c = qb.query(db,null,
-						Routes.System+" = ? AND "+
-						Routes.Expiration+" > ?",
-						new String[] {system, new Long(getToday()).toString()}, null, null, null);
-				if(c.moveToLast()) {
-					c.close();return;
-				} else c.close();
-				db.delete(Routes.TABLE_NAME,
-						Routes.System +"=?", new String[] {system});
-				ArrayList<Route> routes = BusTimeAPI.getRoutes(getContext(), system);
-				for(Route r : routes) {
+			synchronized (this) {
+				final Cursor c = qb.query(db, null, Routes.System + " = ? AND "
+						+ Routes.Expiration + " > ?", new String[] { system,
+						new Long(getToday()).toString() }, null, null, null);
+				if (c.moveToLast()) {
+					c.close();
+					return;
+				} else
+					c.close();
+				db.delete(Routes.TABLE_NAME, Routes.System + "=?",
+						new String[] { system });
+				ArrayList<Route> routes = BusTimeAPI.getRoutes(getContext(),
+						system);
+				for (Route r : routes) {
 					ContentValues cv = new ContentValues();
 					cv.put(Routes.RouteName, r.getName());
 					cv.put(Routes.RouteNumber, r.getRt());
@@ -237,72 +272,79 @@ public class AutolycusProvider extends ContentProvider {
 				}
 			}
 		} catch (Exception e) {
-			Log.e(TAG,e.toString());
+			Log.e(TAG, e.toString());
+			throw new NetworkRetrivalFailed(e.getMessage());
 		}
 	}
-	
-	private void fetchDirections(String system, String rt) {
+
+	private void fetchDirections(String system, String rt) throws NetworkRetrivalFailed {
 		final SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try {
 			final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 			qb.setTables(Directions.TABLE_NAME);
 			/* don't query unless I am the only one querying/inserting */
-			synchronized(this) {
-				final Cursor c = qb.query(db,null,
-						Directions.System+" = ? AND "+
-						Directions.RouteNumber+" = ? AND "+
-						Directions.Expiration+" > ?",
-						new String[] {system, rt, new Long(getToday()).toString()},
-						null, null, null);
-				if(c.moveToLast()) {
-					c.close();return;
-				} else c.close();
-				db.delete(Directions.TABLE_NAME,
-						Directions.System +"=? AND "+
-						Directions.RouteNumber+"=?",
-						new String[] {system, rt});
-				ArrayList<String> dirs = BusTimeAPI.getDirections(getContext(), system, rt);
-				for(String d : dirs) {
+			synchronized (this) {
+				final Cursor c = qb.query(db, null, Directions.System
+						+ " = ? AND " + Directions.RouteNumber + " = ? AND "
+						+ Directions.Expiration + " > ?", new String[] {
+						system, rt, new Long(getToday()).toString() }, null,
+						null, null);
+				if (c.moveToLast()) {
+					c.close();
+					return;
+				} else
+					c.close();
+				db.delete(Directions.TABLE_NAME, Directions.System + "=? AND "
+						+ Directions.RouteNumber + "=?", new String[] { system,
+						rt });
+				ArrayList<String> dirs = BusTimeAPI.getDirections(getContext(),
+						system, rt);
+				for (String d : dirs) {
 					ContentValues cv = new ContentValues();
 					cv.put(Directions.System, system);
-					cv.put(Directions.RouteNumber,rt);
+					cv.put(Directions.RouteNumber, rt);
 					cv.put(Directions.Direction, d);
 					cv.put(Directions.Expiration, getFuture());
 					db.insert(Directions.TABLE_NAME, null, cv);
 				}
 			}
 		} catch (Exception e) {
-			Log.e(TAG,e.toString());
+			Log.e(TAG, e.toString());
+			throw new NetworkRetrivalFailed(e.getMessage());
 		}
 	}
-	
-	private void fetchStops(String system, String rt, String dir) {
+
+	private void fetchStops(String system, String rt, String dir)
+			throws NetworkRetrivalFailed {
 		final SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try {
 			final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 			qb.setTables(Stops.TABLE_NAME);
 			/* don't query unless I am the only one querying/inserting */
-			synchronized(this) {
-				final Cursor c = qb.query(db,null,
-						Stops.System+" = ? AND "+
-						Stops.RouteNumber+" = ? AND "+
-						Stops.Direction+" = ? AND "+
-						Stops.Expiration+" > ?",
-						new String[] {system, rt, dir, new Long(getToday()).toString()},
-						null, null, null);
-				if(c.moveToLast()) {
-					c.close();return;
-				} else c.close();
-				db.delete(Stops.TABLE_NAME,
-						Stops.System +"=? AND "+
-						Stops.RouteNumber+"=? AND "+
-						Stops.Direction+"=?",
-						new String[] {system, rt, dir});
-				ArrayList<StopInfo> stops = BusTimeAPI.getStops(getContext(), system, rt,dir);
-				for(StopInfo stop : stops) {
+			synchronized (this) {
+				final Cursor c = qb.query(
+						db,
+						null,
+						Stops.System + " = ? AND " + Stops.RouteNumber
+								+ " = ? AND " + Stops.Direction + " = ? AND "
+								+ Stops.Expiration + " > ?",
+						new String[] { system, rt, dir,
+								new Long(getToday()).toString() }, null, null,
+						null);
+				if (c.moveToLast()) {
+					c.close();
+					return;
+				} else
+					c.close();
+				db.delete(Stops.TABLE_NAME, Stops.System + "=? AND "
+						+ Stops.RouteNumber + "=? AND " + Stops.Direction
+						+ "=?", new String[] { system, rt, dir });
+				ArrayList<StopInfo> stops = BusTimeAPI.getStops(getContext(),
+						system, rt, dir);
+				for (StopInfo stop : stops) {
 					ContentValues cv = new ContentValues();
 					cv.put(Stops.System, system);
-					cv.put(Stops.RouteNumber,rt);
+					cv.put(Stops.RouteNumber, rt);
 					cv.put(Stops.Direction, dir);
 					cv.put(Stops.Name, stop.getStpnm());
 					cv.put(Stops.StopID, stop.getStpid());
@@ -313,21 +355,26 @@ public class AutolycusProvider extends ContentProvider {
 				}
 			}
 		} catch (Exception e) {
-			Log.e(TAG,e.toString());
+			Log.e(TAG, e.toString());
+			throw new NetworkRetrivalFailed(e.getMessage());
 		}
 	}
-	
+
 	private Cursor fetchPreds(String system, String stpid, String route) {
-		//need some out of band communications....
+		// need some out of band communications....
 		MatrixCursor cur = new MatrixCursor(Predictions.getColumns) {
 			private Bundle mBundle = new Bundle();
+
 			@Override
-			public Bundle getExtras() { return mBundle; }
+			public Bundle getExtras() {
+				return mBundle;
+			}
 		};
 		try {
-			ArrayList<Prediction> preds = BusTimeAPI.getPrediction(getContext(), system, stpid,route);
+			ArrayList<Prediction> preds = BusTimeAPI.getPrediction(
+					getContext(), system, stpid, route);
 			int i = 0;
-			for(Prediction pred : preds) {
+			for (Prediction pred : preds) {
 				MatrixCursor.RowBuilder row = cur.newRow();
 				row.add(i++);
 				row.add(pred.getRoute());
@@ -344,7 +391,7 @@ public class AutolycusProvider extends ContentProvider {
 				row.add(pred.getPredTime().getTime());
 			}
 		} catch (Exception e) {
-			cur.getExtras().putString(ERROR_MSG,e.getMessage());
+			cur.getExtras().putString(ERROR_MSG, e.getMessage());
 		}
 		return cur;
 	}
@@ -356,20 +403,30 @@ public class AutolycusProvider extends ContentProvider {
 	private long getToday() {
 		return new Date().getTime();
 	}
-	
+
 	private long getFuture() {
 		Calendar cal = Calendar.getInstance();
 		cal.set(2030, 1, 1);
 		return cal.getTimeInMillis();
 	}
 
-	/* (non-Javadoc)
-	 * @see android.content.ContentProvider#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.ContentProvider#update(android.net.Uri,
+	 * android.content.ContentValues, java.lang.String, java.lang.String[])
 	 */
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
 		return 0;
+	}
+
+	private class NetworkRetrivalFailed extends Exception {
+		private static final long serialVersionUID = 5966554991083244524L;
+		public NetworkRetrivalFailed(String message) {
+			super(message);
+		}
 	}
 
 }

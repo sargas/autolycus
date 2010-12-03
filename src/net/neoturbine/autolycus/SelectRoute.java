@@ -1,5 +1,6 @@
 package net.neoturbine.autolycus;
 
+import net.neoturbine.autolycus.providers.AutolycusProvider;
 import net.neoturbine.autolycus.providers.Routes;
 import net.neoturbine.autolycus.providers.Systems;
 import android.app.ListActivity;
@@ -13,12 +14,14 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 public class SelectRoute extends ListActivity implements OnItemClickListener {
 	public static final String SELECT_ROUTE = "net.neoturbine.autolycus.SELECT_ROUTE";
 	private Spinner systemSpin;
 	private String system;
 	private SimpleCursorAdapter rva;
+	private TextView errorText;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,7 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 		
 		getListView().setOnItemClickListener(this);
 		systemSpin = (Spinner) findViewById(R.id.system_spinner);
+		errorText = (TextView) findViewById(R.id.txt_route_error);
 		loadSystems();
 	}
 
@@ -79,6 +83,14 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 			@Override
 			protected void onPostExecute(Cursor result) {
 				setProgressBarIndeterminateVisibility(false);
+				if (result.getExtras().containsKey(AutolycusProvider.ERROR_MSG)) {
+					setListAdapter(null);
+					errorText.setVisibility(View.VISIBLE);
+					errorText.setText(result
+						.getExtras().getString(AutolycusProvider.ERROR_MSG));
+					return;
+				}
+				//errorText.setVisibility(View.GONE);
 				if(rva != null) {
 					rva.changeCursor(result);
 				} else {
@@ -87,9 +99,8 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 							result,
 							new String[] { Routes.RouteNumber, Routes.RouteName },
 							new int[] { android.R.id.text1, android.R.id.text2 });
-
-					setListAdapter(rva);
 				}
+				setListAdapter(rva);
 			}
 		}.execute();
 	}
