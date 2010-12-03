@@ -1,8 +1,9 @@
 /**
  * 
  */
-package net.neoturbine.autolycus;
+package net.neoturbine.autolycus.prefs;
 
+import net.neoturbine.autolycus.R;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 

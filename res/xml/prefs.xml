@@ -5,4 +5,6 @@
 	android:title="@string/prefs_delay" android:key="update_delay"
 	android:inputType="number" android:defaultValue="60" 
 	android:numeric="integer" android:persistent="true" />
+
+<net.neoturbine.autolycus.prefs.ClearCachePreference />
 </PreferenceScreen>

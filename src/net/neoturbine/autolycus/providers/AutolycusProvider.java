@@ -33,7 +33,7 @@ public class AutolycusProvider extends ContentProvider {
 	public static final String AUTHORITY = "net.neoturbine.providers.autolycus";
 	public static final String ERROR_MSG = "error";
 
-	private static final String DATABASE_NAME = "cache.db";
+	public static final String DATABASE_NAME = "cache.db";
 	private static final int DATABASE_VERSION = 1;
 
 	private static final UriMatcher uriMatcher;

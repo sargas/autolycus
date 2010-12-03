@@ -3,6 +3,8 @@ package net.neoturbine.autolycus;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import net.neoturbine.autolycus.prefs.Prefs;
 import net.neoturbine.autolycus.providers.AutolycusProvider;
 import net.neoturbine.autolycus.providers.Predictions;
 import android.app.Dialog;
