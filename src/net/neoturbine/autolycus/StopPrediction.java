@@ -89,6 +89,7 @@ public class StopPrediction extends ListActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
+		limitRoute = true;
 		updatePredictions();
 	}
 
@@ -132,6 +133,7 @@ public class StopPrediction extends ListActivity {
 		@Override
 		protected void onPreExecute() {
 			setProgressBarIndeterminateVisibility(true);
+			((CheckBox)findViewById(R.id.predictions_showall)).setChecked(!limitRoute);
 		}
 
 		@Override
@@ -154,6 +156,7 @@ public class StopPrediction extends ListActivity {
 			setProgressBarIndeterminateVisibility(false);
 
 			setListAdapter(null);
+			((TextView) findViewById(R.id.txt_stop_predtime)).setText("");
 
 			if (cur.getExtras().containsKey(AutolycusProvider.ERROR_MSG)) {
 				((TextView) findViewById(R.id.txt_stop_error)).setText(cur
