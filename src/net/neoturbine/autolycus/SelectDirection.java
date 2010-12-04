@@ -88,6 +88,13 @@ public class SelectDirection extends ListActivity implements
 							new String[] { Directions.Direction },
 							new int[] { android.R.id.text1 }));
 				}
+				
+				//display afterwards, so we don't have a blank screen if the user hits back
+				if(result.getCount() == 1) {
+					result.moveToFirst();
+					String dir = result.getString(result.getColumnIndexOrThrow(Directions.Direction));
+					startActivityForResult(getStopIntent(dir), GET_STOP);
+				}
 			}
 		}.execute();
 	}
