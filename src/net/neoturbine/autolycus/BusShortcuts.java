@@ -1,5 +1,19 @@
 /**
- * 
+ * This file is part of Autolycus.
+ * Copyright 2010 Joseph Jon Booker.
+ *
+ * Autolycus is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * Autolycus is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with Autolycus.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.neoturbine.autolycus;
 
@@ -15,7 +29,7 @@ import android.widget.TextView;
 
 /**
  * @author Joseph Booker
- *
+ * 
  */
 public class BusShortcuts extends Activity {
 	private static final int PICK_STOP = 1;
@@ -24,70 +38,77 @@ public class BusShortcuts extends Activity {
 	private String direction;
 	private String stopname;
 	private int stopid;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-        final Intent intent = getIntent();
-        final String action = intent.getAction();
-		
+
+		final Intent intent = getIntent();
+		final String action = intent.getAction();
+
 		if (Intent.ACTION_CREATE_SHORTCUT.equals(action)) {
-			Intent stopintent = new Intent(Intent.ACTION_PICK,Routes.CONTENT_URI);
+			Intent stopintent = new Intent(Intent.ACTION_PICK,
+					Routes.CONTENT_URI);
 			startActivityForResult(stopintent, PICK_STOP);
 		} else {
 			setResult(RESULT_CANCELED);
 			finish();
 		}
 	}
-	
+
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(requestCode == PICK_STOP) {
-			 if(resultCode == RESULT_OK) {
-				 setContentView(R.layout.shortcut);
-				 system = data.getStringExtra(SelectStop.EXTRA_SYSTEM);
-				 route = data.getStringExtra(SelectStop.EXTRA_ROUTE);
-				 direction = data.getStringExtra(SelectStop.EXTRA_DIRECTION);
-				 stopid = data.getIntExtra(SelectStop.EXTRA_STOPID,-1);
-				 stopname = data.getStringExtra(SelectStop.EXTRA_STOPNAME);
-				 
-				 ((TextView)findViewById(R.id.shortcut_sys)).setText(system);
-				 ((TextView)findViewById(R.id.shortcut_route)).setText("Route "+route);
-				 ((TextView)findViewById(R.id.shortcut_direction)).setText(direction);
-				 ((TextView)findViewById(R.id.shortcut_stpnm)).setText(stopname);
-				 ((EditText)findViewById(R.id.shortcut_stopname)).setText(stopname);
-				 
-				 ((Button)findViewById(R.id.shortcut_submit))
-				 	.setOnClickListener(new View.OnClickListener(){
-				 		public void onClick(View v) {
-				 			returnShortcut();
-				 		}
-				 	});
-			 }
+		if (requestCode == PICK_STOP) {
+			if (resultCode == RESULT_OK) {
+				setContentView(R.layout.shortcut);
+				system = data.getStringExtra(SelectStop.EXTRA_SYSTEM);
+				route = data.getStringExtra(SelectStop.EXTRA_ROUTE);
+				direction = data.getStringExtra(SelectStop.EXTRA_DIRECTION);
+				stopid = data.getIntExtra(SelectStop.EXTRA_STOPID, -1);
+				stopname = data.getStringExtra(SelectStop.EXTRA_STOPNAME);
+
+				((TextView) findViewById(R.id.shortcut_sys)).setText(system);
+				((TextView) findViewById(R.id.shortcut_route)).setText("Route "
+						+ route);
+				((TextView) findViewById(R.id.shortcut_direction))
+						.setText(direction);
+				((TextView) findViewById(R.id.shortcut_stpnm))
+						.setText(stopname);
+				((EditText) findViewById(R.id.shortcut_stopname))
+						.setText(stopname);
+
+				((Button) findViewById(R.id.shortcut_submit))
+						.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								returnShortcut();
+							}
+						});
+			}
 		}
 	}
-	
+
 	public void returnShortcut() {
-		Intent shortcutIntent =  new Intent();
+		Intent shortcutIntent = new Intent();
 		shortcutIntent.setAction(StopPrediction.OPEN_STOP_ACTION);
 		shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		shortcutIntent
-			.putExtra(SelectStop.EXTRA_SYSTEM, system)
-			.putExtra(SelectStop.EXTRA_ROUTE, route)
-			.putExtra(SelectStop.EXTRA_DIRECTION, direction)
-			.putExtra(SelectStop.EXTRA_STOPNAME, stopname)
-			.putExtra(SelectStop.EXTRA_STOPID, stopid);
-		
+		shortcutIntent.putExtra(SelectStop.EXTRA_SYSTEM, system)
+				.putExtra(SelectStop.EXTRA_ROUTE, route)
+				.putExtra(SelectStop.EXTRA_DIRECTION, direction)
+				.putExtra(SelectStop.EXTRA_STOPNAME, stopname)
+				.putExtra(SelectStop.EXTRA_STOPID, stopid);
+
 		Intent intent = new Intent();
 		intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
 		intent.putExtra(Intent.EXTRA_SHORTCUT_NAME,
-				((TextView)findViewById(R.id.shortcut_stopname)).getText().toString());
-		Parcelable iconResource = Intent.ShortcutIconResource.fromContext(
-				this, R.drawable.icon);
+				((TextView) findViewById(R.id.shortcut_stopname)).getText()
+						.toString());
+		Parcelable iconResource = Intent.ShortcutIconResource.fromContext(this,
+				R.drawable.icon);
 		intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
-		
+
 		setResult(RESULT_OK, intent);
 		finish();
 	}
-	
+
 }

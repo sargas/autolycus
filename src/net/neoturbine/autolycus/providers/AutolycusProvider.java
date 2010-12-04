@@ -1,5 +1,19 @@
 /**
- * 
+ * This file is part of Autolycus.
+ * Copyright 2010 Joseph Jon Booker.
+ *
+ * Autolycus is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * Autolycus is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with Autolycus.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.neoturbine.autolycus.providers;
 
@@ -81,9 +95,9 @@ public class AutolycusProvider extends ContentProvider {
 					.append("' VARCHAR(255) UNIQUE").append(");");
 			db.execSQL(str.toString());
 
-			addSystem("Chicago Transit Authority","CTA",db);
-			addSystem("Ohio State University TRIP","OSU TRIP",db);
-			addSystem("MTA New York City Transit","MTA",db);
+			addSystem("Chicago Transit Authority", "CTA", db);
+			addSystem("Ohio State University TRIP", "OSU TRIP", db);
+			addSystem("MTA New York City Transit", "MTA", db);
 
 			str = new StringBuilder();
 			str.append("CREATE TABLE ").append(Directions.TABLE_NAME)
@@ -110,7 +124,7 @@ public class AutolycusProvider extends ContentProvider {
 					.append(Stops.Expiration).append("' INTEGER").append(");");
 			db.execSQL(str.toString());
 		}
-		
+
 		private void addSystem(String name, String abbriv, SQLiteDatabase db) {
 			ContentValues cv = new ContentValues();
 			cv.put(Systems.Name, name);
@@ -232,7 +246,7 @@ public class AutolycusProvider extends ContentProvider {
 			c.setNotificationUri(getContext().getContentResolver(), uri);
 			return c;
 		} catch (NetworkRetrivalFailed e) {
-			Cursor c = new MatrixCursor(new String[] {"_ID"}) {
+			Cursor c = new MatrixCursor(new String[] { "_ID" }) {
 				private Bundle mBundle = new Bundle();
 
 				@Override
@@ -279,7 +293,8 @@ public class AutolycusProvider extends ContentProvider {
 		}
 	}
 
-	private void fetchDirections(String system, String rt) throws NetworkRetrivalFailed {
+	private void fetchDirections(String system, String rt)
+			throws NetworkRetrivalFailed {
 		final SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try {
 			final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
@@ -362,7 +377,8 @@ public class AutolycusProvider extends ContentProvider {
 		}
 	}
 
-	private Cursor fetchPreds(String system, String stpid, String route, String dir) {
+	private Cursor fetchPreds(String system, String stpid, String route,
+			String dir) {
 		// need some out of band communications....
 		MatrixCursor cur = new MatrixCursor(Predictions.getColumns) {
 			private Bundle mBundle = new Bundle();
@@ -377,7 +393,9 @@ public class AutolycusProvider extends ContentProvider {
 					getContext(), system, stpid, route);
 			int i = 0;
 			for (Prediction pred : preds) {
-				if(dir != null) if(!pred.getDirection().equals(dir)) continue;
+				if (dir != null)
+					if (!pred.getDirection().equals(dir))
+						continue;
 				MatrixCursor.RowBuilder row = cur.newRow();
 				row.add(i++);
 				row.add(pred.getRoute());
@@ -427,6 +445,7 @@ public class AutolycusProvider extends ContentProvider {
 
 	private class NetworkRetrivalFailed extends Exception {
 		private static final long serialVersionUID = 5966554991083244524L;
+
 		public NetworkRetrivalFailed(String message) {
 			super(message);
 		}

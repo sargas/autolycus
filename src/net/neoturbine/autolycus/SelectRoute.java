@@ -1,3 +1,20 @@
+/**
+ * This file is part of Autolycus.
+ * Copyright 2010 Joseph Jon Booker.
+ *
+ * Autolycus is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * Autolycus is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with Autolycus.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.neoturbine.autolycus;
 
 import net.neoturbine.autolycus.providers.AutolycusProvider;
@@ -24,7 +41,7 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 	private String system;
 	private SimpleCursorAdapter rva;
 	private TextView errorText;
-	
+
 	private static final int GET_DIRECTION = 0;
 
 	@Override
@@ -35,7 +52,7 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 		setProgressBarIndeterminateVisibility(true);
 
 		setContentView(R.layout.routepicker);
-		
+
 		getListView().setOnItemClickListener(this);
 		systemSpin = (Spinner) findViewById(R.id.system_spinner);
 		errorText = (TextView) findViewById(R.id.txt_route_error);
@@ -43,23 +60,24 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 	}
 
 	private void loadSystems() {
-		final String[] SYSTEM_PROJECTION = new String[] {
-				Systems._ID, Systems.Name
-		};
-		Cursor cur = managedQuery(Systems.CONTENT_URI, SYSTEM_PROJECTION,
-				null, null, null);
+		final String[] SYSTEM_PROJECTION = new String[] { Systems._ID,
+				Systems.Name };
+		Cursor cur = managedQuery(Systems.CONTENT_URI, SYSTEM_PROJECTION, null,
+				null, null);
 		SimpleCursorAdapter adapter2 = new SimpleCursorAdapter(this,
-				android.R.layout.simple_spinner_item,
-				cur,
-				new String[] {Systems.Name},
-				new int[] {android.R.id.text1});
+				android.R.layout.simple_spinner_item, cur,
+				new String[] { Systems.Name }, new int[] { android.R.id.text1 });
 		adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		systemSpin.setAdapter(adapter2);
-		if(PreferenceManager.getDefaultSharedPreferences(this).contains("default_system")) {
-			String defaultsystem = PreferenceManager.getDefaultSharedPreferences(this).getString("default_system", "");
+		if (PreferenceManager.getDefaultSharedPreferences(this).contains(
+				"default_system")) {
+			String defaultsystem = PreferenceManager
+					.getDefaultSharedPreferences(this).getString(
+							"default_system", "");
 			final int count = cur.getCount();
-			for(int i=0;i<count;++i) {
-				if(cur.getString(cur.getColumnIndexOrThrow(Systems.Name)).equals(defaultsystem)) {
+			for (int i = 0; i < count; ++i) {
+				if (cur.getString(cur.getColumnIndexOrThrow(Systems.Name))
+						.equals(defaultsystem)) {
 					systemSpin.setSelection(i);
 					break;
 				}
@@ -67,18 +85,21 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 			}
 		}
 
-		systemSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int pos, long id) {
-				Cursor cur = (Cursor)parent.getItemAtPosition(pos);
+		systemSpin
+				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+					@Override
+					public void onItemSelected(AdapterView<?> parent,
+							View view, int pos, long id) {
+						Cursor cur = (Cursor) parent.getItemAtPosition(pos);
 
-				system = cur.getString(cur.getColumnIndex(Systems.Name));
-				loadRoutes();
-			}
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {}
-		});
+						system = cur.getString(cur.getColumnIndex(Systems.Name));
+						loadRoutes();
+					}
+
+					@Override
+					public void onNothingSelected(AdapterView<?> arg0) {
+					}
+				});
 	}
 
 	public void loadRoutes() {
@@ -87,29 +108,31 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 			protected void onPreExecute() {
 				setProgressBarIndeterminateVisibility(true);
 			}
+
 			@Override
 			protected Cursor doInBackground(Void... params) {
-				final String[] PROJECTION = new String[] {
-						Routes._ID, Routes.RouteNumber, Routes.RouteName
-				};
+				final String[] PROJECTION = new String[] { Routes._ID,
+						Routes.RouteNumber, Routes.RouteName };
 				return managedQuery(Routes.CONTENT_URI, PROJECTION,
-						Routes.System+"=?", new String[] {system} , null);
+						Routes.System + "=?", new String[] { system }, null);
 			}
+
 			@Override
 			protected void onPostExecute(Cursor result) {
 				setProgressBarIndeterminateVisibility(false);
 				if (result.getExtras().containsKey(AutolycusProvider.ERROR_MSG)) {
 					setListAdapter(null);
 					errorText.setVisibility(View.VISIBLE);
-					errorText.setText(result
-						.getExtras().getString(AutolycusProvider.ERROR_MSG));
+					errorText.setText(result.getExtras().getString(
+							AutolycusProvider.ERROR_MSG));
 					return;
 				}
-				//errorText.setVisibility(View.GONE);
-				if(rva != null) {
+				// errorText.setVisibility(View.GONE);
+				if (rva != null) {
 					rva.changeCursor(result);
 				} else {
-					rva = new SimpleCursorAdapter(SelectRoute.this,
+					rva = new SimpleCursorAdapter(
+							SelectRoute.this,
 							R.layout.route_list_item,
 							result,
 							new String[] { Routes.RouteNumber, Routes.RouteName },
@@ -120,31 +143,33 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 		}.execute();
 	}
 
+	@Override
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-		if(position >= 0) {
+		if (position >= 0) {
 			final Cursor c = (Cursor) parent.getItemAtPosition(position);
-			final String selectedRoute = c.getString(c.getColumnIndexOrThrow(Routes.RouteNumber));
-			final Intent dirintent = new Intent(Intent.ACTION_PICK,Directions.CONTENT_URI);
+			final String selectedRoute = c.getString(c
+					.getColumnIndexOrThrow(Routes.RouteNumber));
+			final Intent dirintent = new Intent(Intent.ACTION_PICK,
+					Directions.CONTENT_URI);
 			dirintent.putExtra(SelectDirection.EXTRA_RT, selectedRoute);
 			dirintent.putExtra(SelectDirection.EXTRA_SYS, system);
 			startActivityForResult(dirintent, GET_DIRECTION);
 		}
 	}
-	
+
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event)  {
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	@Override
-	public void onActivityResult(int requestCode, int resultCode,
-            Intent data) {
-		if(requestCode == GET_DIRECTION) {
-			if(resultCode == RESULT_OK) {
-				setResult(RESULT_OK,data);
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == GET_DIRECTION) {
+			if (resultCode == RESULT_OK) {
+				setResult(RESULT_OK, data);
 				finish();
 			}
 		}

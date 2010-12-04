@@ -1,3 +1,20 @@
+/**
+ * This file is part of Autolycus.
+ * Copyright 2010 Joseph Jon Booker.
+ *
+ * Autolycus is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * Autolycus is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with Autolycus.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.neoturbine.autolycus;
 
 import java.util.concurrent.Executors;
@@ -106,6 +123,7 @@ public class StopPrediction extends ListActivity {
 
 		if (delay == 0) {
 			runOnUiThread(new Runnable() {
+				@Override
 				public void run() {
 					new UpdatePredictionsTask().execute();
 				}
@@ -116,6 +134,7 @@ public class StopPrediction extends ListActivity {
 				@Override
 				public void run() {
 					runOnUiThread(new Runnable() {
+						@Override
 						public void run() {
 							new UpdatePredictionsTask().execute();
 						}
@@ -135,7 +154,8 @@ public class StopPrediction extends ListActivity {
 		@Override
 		protected void onPreExecute() {
 			setProgressBarIndeterminateVisibility(true);
-			((CheckBox)findViewById(R.id.predictions_showall)).setChecked(!limitRoute);
+			((CheckBox) findViewById(R.id.predictions_showall))
+					.setChecked(!limitRoute);
 		}
 
 		@Override
@@ -151,7 +171,8 @@ public class StopPrediction extends ListActivity {
 								+ Predictions.StopID + "=? AND "
 								+ Predictions.RouteNumber + "=? AND "
 								+ Predictions.Direction + "=?", new String[] {
-								system, Integer.toString(stpid), route , direction}, null);
+								system, Integer.toString(stpid), route,
+								direction }, null);
 		}
 
 		@Override

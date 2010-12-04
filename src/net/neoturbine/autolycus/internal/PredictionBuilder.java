@@ -1,3 +1,20 @@
+/**
+ * This file is part of Autolycus.
+ * Copyright 2010 Joseph Jon Booker.
+ *
+ * Autolycus is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * Autolycus is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with Autolycus.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.neoturbine.autolycus.internal;
 
 import android.util.Log;
@@ -17,7 +34,7 @@ public class PredictionBuilder {
 	private String des; // destination
 	private boolean delayed = false;
 	private static final String TAG = "Autolycus";
-	
+
 	private boolean isSet = false;
 
 	private Date estTime; // estimated time
@@ -25,7 +42,9 @@ public class PredictionBuilder {
 	// date format used by above two
 	private final static SimpleDateFormat _df = new SimpleDateFormat(
 			"yyyyMMdd HH:mm");
-	static {_df.setTimeZone(TimeZone.getDefault()); }
+	static {
+		_df.setTimeZone(TimeZone.getDefault());
+	}
 
 	// constants for predtype
 	public static final int ARRIVAL_PREDICTION = 1;
@@ -51,8 +70,10 @@ public class PredictionBuilder {
 	public PredictionBuilder() {// default constructor
 		super();
 	}
-	
-	public boolean isSet() { return isSet; }
+
+	public boolean isSet() {
+		return isSet;
+	}
 
 	// use to go from getpredictions to this object
 	public void setField(String name, String value) throws ParseException {
@@ -186,9 +207,8 @@ public class PredictionBuilder {
 	}
 
 	public Prediction toPrediction() {
-		return new Prediction(predtype, stopName, stpid, vid,
-				distance, rt, dir, des, estTime,
-				predTime, delayed);
+		return new Prediction(predtype, stopName, stpid, vid, distance, rt,
+				dir, des, estTime, predTime, delayed);
 	}
 
 }
