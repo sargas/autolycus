@@ -1,35 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:orientation="vertical">
+  android:layout_height="fill_parent">
 
 <TextView
-	android:id="@+id/shortcut_stop"
+	android:id="@+id/shortcut_sys"
 	android:layout_height="wrap_content"
 	android:layout_width="fill_parent"
+	android:textAppearance="?android:attr/textAppearanceLarge" />
+<TextView
+	android:id="@+id/shortcut_stpnm"
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:layout_below="@+id/shortcut_sys"
+	android:textAppearance="?android:attr/textAppearanceLarge" />
+<TextView
+	android:id="@+id/shortcut_route"
+	android:layout_height="wrap_content"
+	android:layout_width="wrap_content"
 	android:textAppearance="?android:attr/textAppearanceLarge"
-	android:maxLines="3" android:paddingBottom="40sp"/>
-<LinearLayout
-	android:orientation="vertical" android:padding="1sp" android:layout_height="fill_parent" android:layout_width="fill_parent">
-	<TextView
-		android:lines="1"
-		android:layout_width="wrap_content"
+	android:layout_below="@+id/shortcut_stpnm"
+	android:layout_alignParentLeft="true" />
+<TextView
+	android:id="@+id/shortcut_direction"
+	android:layout_height="wrap_content"
+	android:layout_width="wrap_content"
+	android:textAppearance="?android:attr/textAppearanceLarge"
+	android:layout_below="@+id/shortcut_stpnm"
+	android:layout_alignParentRight="true" />
+<TextView
+		android:id="@+id/shortcut_stopname_label"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:text="@string/shortcut_stopname"
-		android:gravity="left"/>
-	<EditText
+		android:paddingTop="50dip"
+		android:gravity="left"
+		android:layout_below="@+id/shortcut_route" />
+<EditText
 		android:lines="1"
 		android:id="@+id/shortcut_stopname"
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content"
 		android:hint="@string/shortcut_stopnamehint"
 		android:scrollHorizontally="true"
-		android:gravity="right"/>
-</LinearLayout>
+		android:gravity="right"
+		android:layout_below="@+id/shortcut_stopname_label"/>
 <Button
 	android:id="@+id/shortcut_submit"
 	android:layout_width="fill_parent"
-	android:layout_height="wrap_content" android:text="@string/shortcut_submit"/>
-</LinearLayout>
+	android:layout_height="wrap_content" android:text="@string/shortcut_submit"
+	android:layout_below="@+id/shortcut_stopname" />
+</RelativeLayout>

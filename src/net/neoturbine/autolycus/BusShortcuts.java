@@ -51,8 +51,10 @@ public class BusShortcuts extends Activity {
 				 stopid = data.getIntExtra(SelectStop.EXTRA_STOPID,-1);
 				 stopname = data.getStringExtra(SelectStop.EXTRA_STOPNAME);
 				 
-				 ((TextView)findViewById(R.id.shortcut_stop)).setText(
-						 system + " Stop \"" + stopname +"\" (" + direction +") on Route "+route);
+				 ((TextView)findViewById(R.id.shortcut_sys)).setText(system);
+				 ((TextView)findViewById(R.id.shortcut_route)).setText("Route "+route);
+				 ((TextView)findViewById(R.id.shortcut_direction)).setText(direction);
+				 ((TextView)findViewById(R.id.shortcut_stpnm)).setText(stopname);
 				 ((EditText)findViewById(R.id.shortcut_stopname)).setText(stopname);
 				 
 				 ((Button)findViewById(R.id.shortcut_submit))

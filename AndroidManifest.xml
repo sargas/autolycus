@@ -6,7 +6,7 @@
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 		<provider android:name=".providers.AutolycusProvider"
 			android:syncable="false" android:authorities="net.neoturbine.providers.autolycus" />
-		<activity android:name="BusShortcuts" android:label="@string/shortcut">
+		<activity android:name="BusShortcuts" android:configChanges="orientation|keyboardHidden" android:label="@string/shortcut">
 			<intent-filter>
 				<action android:name="android.intent.action.CREATE_SHORTCUT" />
 				<category android:name="android.intent.category.DEFAULT" />
