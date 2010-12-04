@@ -1,5 +1,4 @@
 Before release:
-- About Dialog
 - Remove MTA if no response from email about broken API
 - README file
 

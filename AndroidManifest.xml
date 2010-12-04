@@ -40,6 +40,10 @@
 			</intent-filter>
 		</activity>
 	<activity android:label="@string/prefs_title" android:name=".prefs.Prefs"></activity>
+<activity android:name="AboutScreen" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"></action>
+<category android:name="android.intent.category.LAUNCHER"></category>
+</intent-filter>
+</activity>
 </application>
 
 	<uses-sdk android:minSdkVersion="4" />
