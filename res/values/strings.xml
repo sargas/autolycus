@@ -14,6 +14,7 @@
 	
 	<string name="prefs_delay_detail">Time in seconds (0 to disable)</string>
 	<string name="prefs_delay">Frequency of Prediction Updates</string>
+	<string name="prefs_defaultsys">Default Transit System</string>
 	
 	<!--  window titles -->
 	<string name="route_title">Select Route</string>

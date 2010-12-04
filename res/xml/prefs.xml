@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-<EditTextPreference android:summary="@string/prefs_delay_detail"
+<ListPreference android:title="@string/prefs_defaultsys" android:key="default_system"></ListPreference><EditTextPreference android:summary="@string/prefs_delay_detail"
 	android:title="@string/prefs_delay" android:key="update_delay"
 	android:inputType="number" android:defaultValue="60" 
 	android:numeric="integer" android:persistent="true" />
 
 <net.neoturbine.autolycus.prefs.ClearCachePreference />
+
 </PreferenceScreen>

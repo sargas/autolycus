@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -54,6 +55,17 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 				new int[] {android.R.id.text1});
 		adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		systemSpin.setAdapter(adapter2);
+		if(PreferenceManager.getDefaultSharedPreferences(this).contains("default_system")) {
+			String defaultsystem = PreferenceManager.getDefaultSharedPreferences(this).getString("default_system", "");
+			final int count = cur.getCount();
+			for(int i=0;i<count;++i) {
+				if(cur.getString(cur.getColumnIndexOrThrow(Systems.Name)).equals(defaultsystem)) {
+					systemSpin.setSelection(i);
+					break;
+				}
+				cur.moveToNext();
+			}
+		}
 
 		systemSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
