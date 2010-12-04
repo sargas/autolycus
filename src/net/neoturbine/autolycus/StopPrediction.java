@@ -17,10 +17,6 @@
  */
 package net.neoturbine.autolycus;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import net.neoturbine.autolycus.prefs.Prefs;
 import net.neoturbine.autolycus.providers.AutolycusProvider;
 import net.neoturbine.autolycus.providers.Predictions;
@@ -30,6 +26,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -39,29 +36,38 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class StopPrediction extends ListActivity {
 	/**
-	 * The action which home screen shortcuts must have to be displayed by this activity.
+	 * The action which home screen shortcuts must have to be displayed by this
+	 * activity.
 	 */
 	public static final String OPEN_STOP_ACTION = "net.neoturbine.autolycus.openstop";
+
+	/**
+	 * How often we recalculate the times for the predictions.
+	 */
+	public static final long PREDICTION_DRAWING_DELAY = 20 * 1000;
 
 	private String system;
 	private String route;
 	private String direction;
 	private int stpid;
 	private String stpnm;
+	private long previousPrediction = -1;
 
 	/**
 	 * Reference to the timer mechanism used to control the periodic updates.
 	 */
-	private volatile ScheduledExecutorService timer;
+	private Handler timerHandler = new Handler();
 
 	/**
-	 * If true, filter buses at this stop by those with the correct route number and direction.
+	 * If true, filter buses at this stop by those with the correct route number
+	 * and direction.
 	 */
 	private boolean limitRoute = true;
 
@@ -79,7 +85,7 @@ public class StopPrediction extends ListActivity {
 					@Override
 					public void onClick(View v) {
 						limitRoute = !(((CheckBox) v).isChecked());
-						updatePredictions();
+						new updatePredictionsTask().execute();
 					}
 				});
 		loadIntent();
@@ -121,53 +127,54 @@ public class StopPrediction extends ListActivity {
 	public void onResume() {
 		super.onResume();
 		limitRoute = true;
-		updatePredictions();
-	}
-
-	/**
-	 * 
-	 */
-	private void updatePredictions() {
-		if (timer != null)
-			timer.shutdown();
-		timer = Executors.newScheduledThreadPool(1);
-		// ugly....
-		int delay = Integer.parseInt(PreferenceManager
-				.getDefaultSharedPreferences(this).getString("update_delay",
-						new Integer(Prefs.DEFAULT_UPDATE_DELAY).toString()));
-
-		if (delay == 0) {
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					new UpdatePredictionsTask().execute();
-				}
-			});
-		} else
-			// very very very ugly. asynctask must be run from UI thread
-			timer.scheduleWithFixedDelay(new Runnable() {
-				@Override
-				public void run() {
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							new UpdatePredictionsTask().execute();
-						}
-					});
-				}
-			}, 0, delay, TimeUnit.SECONDS);
+		new updatePredictionsTask().execute();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		if (timer != null)
-			timer.shutdown();
+		timerHandler.removeCallbacks(updateViewsTask);
 	}
 
-	private class UpdatePredictionsTask extends AsyncTask<Void, Void, Cursor> {
+	/**
+	 * A Runnable which calculates the next time it should be run, and either
+	 * forces the list view to re-display itself or calls updatePredictionsTask
+	 * to retrieve new stop predictions.
+	 */
+	private Runnable updateViewsTask = new Runnable() {
+		public void run() {
+			final long currentTime = System.currentTimeMillis();
+			final int delay = Integer
+					.parseInt(PreferenceManager.getDefaultSharedPreferences(
+							StopPrediction.this).getString("update_delay",
+							new Integer(Prefs.DEFAULT_UPDATE_DELAY).toString()));
+
+			if (delay == 0)
+				return;
+			if (currentTime - previousPrediction > delay * 1000) {
+				new updatePredictionsTask().execute();
+			} else {
+				android.util.Log.v("StopPrediction", "Redrawing");
+				((BaseAdapter)getListAdapter()).notifyDataSetChanged();
+				final long timeTillUpdate = delay * 1000
+						- (currentTime - previousPrediction);
+				if (timeTillUpdate < PREDICTION_DRAWING_DELAY)
+					timerHandler.postDelayed(this, timeTillUpdate);
+				else
+					timerHandler.postDelayed(this, PREDICTION_DRAWING_DELAY);
+			}
+
+		}
+	};
+
+	/**
+	 * An AsyncTask which performs a network query in the background, using the
+	 * result to populate the ListView and schedule an update.
+	 */
+	private class updatePredictionsTask extends AsyncTask<Void, Void, Cursor> {
 		@Override
 		protected void onPreExecute() {
+			timerHandler.removeCallbacks(updateViewsTask);
 			setProgressBarIndeterminateVisibility(true);
 			((CheckBox) findViewById(R.id.predictions_showall))
 					.setChecked(!limitRoute);
@@ -227,6 +234,10 @@ public class StopPrediction extends ListActivity {
 										.getColumnIndexOrThrow(Predictions.PredictionTime))));
 				setListAdapter(adp);
 				registerForContextMenu(getListView());
+				previousPrediction = System.currentTimeMillis();
+				timerHandler.removeCallbacks(updateViewsTask);
+				timerHandler.postDelayed(updateViewsTask,
+						PREDICTION_DRAWING_DELAY);
 			} else
 				((TextView) findViewById(R.id.txt_stop_error))
 						.setText(R.string.no_arrival);
@@ -244,7 +255,7 @@ public class StopPrediction extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.prediction_update:
-			updatePredictions();
+			new updatePredictionsTask().execute();
 			return true;
 		case R.id.prediction_prefs:
 			startActivity(new Intent(this, Prefs.class));

@@ -19,16 +19,22 @@ package net.neoturbine.autolycus.prefs;
 
 import net.neoturbine.autolycus.R;
 import net.neoturbine.autolycus.providers.Systems;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 
 /**
  * @author Joseph Booker
  * 
  */
-public class Prefs extends PreferenceActivity {
+public class Prefs extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	public final static int DEFAULT_UPDATE_DELAY = 60;
 	private ListPreference defaultsys;
 
@@ -41,6 +47,8 @@ public class Prefs extends PreferenceActivity {
 		defaultsys = (ListPreference) findPreference("default_system");
 
 		loadSystems();
+		
+		PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 	}
 
 	private void loadSystems() {
@@ -60,5 +68,28 @@ public class Prefs extends PreferenceActivity {
 		defaultsys.setEntryValues(systems);
 
 		cur.close();
+	}
+	
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
+		if(key.equals("update_delay")) {
+			String newvalue = sp.getString(key, null);
+			if(Integer.parseInt(newvalue) < 30) {
+				Editor edit = sp.edit();
+				edit.putString("update_delay", "30");
+				edit.commit();
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage(R.string.prefs_delay_error);
+				builder.setPositiveButton(android.R.string.ok,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
+		}
 	}
 }

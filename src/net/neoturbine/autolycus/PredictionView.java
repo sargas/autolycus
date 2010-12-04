@@ -22,6 +22,7 @@ import net.neoturbine.autolycus.internal.PredictionBuilder;
 import net.neoturbine.autolycus.providers.Predictions;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Canvas;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -92,14 +93,34 @@ public class PredictionView extends LinearLayout {
 	 * Reloads the data from this cursor and sets the views accordingly
 	 */
 	public void resetLabels() {
-		long estTime = pred.getLong(pred
-				.getColumnIndexOrThrow(Predictions.EstimatedTime));
-		int predType = pred
-				.getInt(pred.getColumnIndexOrThrow(Predictions.Type));
 		String route = pred.getString(pred
 				.getColumnIndexOrThrow(Predictions.RouteNumber));
 		String dest = pred.getString(pred
 				.getColumnIndexOrThrow(Predictions.Destination));
+
+		updateTimes();
+		
+		if (stopinfo)
+			routeView.setText(route + " - To " + dest);
+		else
+			routeView.setText("To " + dest);
+	}
+	
+	/**
+	 * Updates the relative times within this view.
+	 */
+	public void updateTimes() {
+		long estTime = pred.getLong(pred
+				.getColumnIndexOrThrow(Predictions.EstimatedTime));
+		int predType = pred
+				.getInt(pred.getColumnIndexOrThrow(Predictions.Type));
+		
+		if(System.currentTimeMillis() > estTime) {
+			setVisibility(GONE);
+			return;
+		} else
+			setVisibility(VISIBLE);
+		
 		if (Math.abs(System.currentTimeMillis() - estTime) < 60 * 1000) {
 			if (predType == PredictionBuilder.ARRIVAL_PREDICTION)
 				timeView.setText(prettyTime(estTime) + " - Arriving now!");
@@ -113,11 +134,6 @@ public class PredictionView extends LinearLayout {
 							System.currentTimeMillis(),
 							DateUtils.MINUTE_IN_MILLIS, 0));
 		}
-
-		if (stopinfo)
-			routeView.setText(route + " - To " + dest);
-		else
-			routeView.setText("To " + dest);
 	}
 
 	/**
@@ -140,4 +156,10 @@ public class PredictionView extends LinearLayout {
 		return formatter.format(time);
 	}
 
+	@Override
+	protected void onDraw (Canvas canvas) {
+		super.onDraw(canvas);
+		
+		updateTimes();
+	}
 }
