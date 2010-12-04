@@ -29,14 +29,33 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+/**
+ * PredictionView is a view for using in a ListView to visualize the results of
+ * a query for a bus stop prediction.
+ * 
+ * @see Predictions
+ * 
+ * @author Joseph Booker
+ * 
+ */
 public class PredictionView extends LinearLayout {
+	/**
+	 * Cursor at the row containing the information we are displaying.
+	 */
 	private Cursor pred;
-	private boolean stopinfo; // if true, be verbose
+	/**
+	 * If true, we show more information (specifically, the router number)
+	 */
+	private boolean stopinfo;
 
-	private TextView routeView; // for verbosity
+	private TextView routeView;
 
 	private TextView timeView;
 
+	/**
+	 * SimpleDateFormat for displaying the time.
+	 * @see #prettyTime(long)
+	 */
 	private static final SimpleDateFormat formatter = new SimpleDateFormat(
 			"hh:mm a");
 
@@ -52,6 +71,12 @@ public class PredictionView extends LinearLayout {
 		init(context);
 	}
 
+	/**
+	 * Helper method called by constructors to make sure the local fields have
+	 * the correct references.
+	 * 
+	 * @param context
+	 */
 	private void init(Context context) {
 		LayoutInflater l = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -63,6 +88,9 @@ public class PredictionView extends LinearLayout {
 				.findViewById(R.id.predictionview_routeview);
 	}
 
+	/**
+	 * Reloads the data from this cursor and sets the views accordingly
+	 */
 	public void resetLabels() {
 		long estTime = pred.getLong(pred
 				.getColumnIndexOrThrow(Predictions.EstimatedTime));
@@ -92,12 +120,22 @@ public class PredictionView extends LinearLayout {
 			routeView.setText("To " + dest);
 	}
 
-	public void setPrediction(Cursor pred, boolean showAllInfo) {
+	/**
+	 * Changes the cursor used for this view.
+	 * @param pred the row to get the prediction information from
+	 * @param showRoute determines if the route is displayed
+	 */
+	public void setPrediction(Cursor pred, boolean showRoute) {
 		this.pred = pred;
-		this.stopinfo = showAllInfo;
+		this.stopinfo = showRoute;
 		resetLabels();
 	}
 
+	/**
+	 * Formats a time stamp as a localized string
+	 * @param time the number milliseconds since January 1, 1970.
+	 * @return a representation of the time as "hh:mm a"
+	 */
 	public static String prettyTime(long time) {
 		return formatter.format(time);
 	}

@@ -28,10 +28,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 /**
+ * This activity creates shortcuts on the home screen, using other activities to
+ * find out what shortcut to create.
+ * 
  * @author Joseph Booker
  * 
  */
 public class BusShortcuts extends Activity {
+	/**
+	 * Request Code for passing to startActivityForResult.
+	 */
 	private static final int PICK_STOP = 1;
 	private String system;
 	private String route;
@@ -88,6 +94,13 @@ public class BusShortcuts extends Activity {
 		}
 	}
 
+	/**
+	 * Creates a new shortcut on the home screen using the fields of this
+	 * activity and the value of the text box containing the name of the
+	 * shortcut.
+	 * 
+	 * @see net.neoturbine.StopPrediction#OPEN_STOP_ACTION
+	 */
 	public void returnShortcut() {
 		Intent shortcutIntent = new Intent();
 		shortcutIntent.setAction(StopPrediction.OPEN_STOP_ACTION);

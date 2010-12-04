@@ -44,7 +44,6 @@ public class SelectStop extends ListActivity implements OnItemClickListener {
 	private String route;
 	private String direction;
 
-	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,6 +61,10 @@ public class SelectStop extends ListActivity implements OnItemClickListener {
 		this.getListView().setFastScrollEnabled(true);
 	}
 
+	/**
+	 * Loads the stops from a background thread using an AsyncTask.
+	 * @see Stops
+	 */
 	private void loadStops() {
 		getListView().setOnItemClickListener(this);
 

@@ -1,0 +1,11 @@
+Before release:
+- About Dialog
+- Remove MTA if no response from email about broken API
+- README file
+
+Possible in release:
+- Finish Javadoc-ing
+
+After release:
+- Add 'View Map' to prediction context menu
+- Integrate service bulletins

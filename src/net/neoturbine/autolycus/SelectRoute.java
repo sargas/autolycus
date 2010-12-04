@@ -27,7 +27,6 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -36,12 +35,23 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+/**
+ * SelectRoute allows the user to choose a route from any bus system, and
+ * eventually passes back to the calling activity the information about the
+ * selected stop.
+ * 
+ * @author Joseph Booker
+ * 
+ */
 public class SelectRoute extends ListActivity implements OnItemClickListener {
 	private Spinner systemSpin;
 	private String system;
-	private SimpleCursorAdapter rva;
+	private SimpleCursorAdapter sca;
 	private TextView errorText;
 
+	/**
+	 * Request Code for passing to startActivityForResult.
+	 */
 	private static final int GET_DIRECTION = 0;
 
 	@Override
@@ -59,6 +69,12 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 		loadSystems();
 	}
 
+	/**
+	 * Loads the names of the systems by using a query in the UI thread.
+	 * This is considered safe since there is no network transaction needed
+	 * for the system names.
+	 * @see Systems
+	 */
 	private void loadSystems() {
 		final String[] SYSTEM_PROJECTION = new String[] { Systems._ID,
 				Systems.Name };
@@ -102,6 +118,10 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 				});
 	}
 
+	/**
+	 * Create an AsyncTask to retrieve the list of routes for the selected system.
+	 * @see Routes
+	 */
 	public void loadRoutes() {
 		new AsyncTask<Void, Void, Cursor>() {
 			@Override
@@ -128,17 +148,17 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 					return;
 				}
 				// errorText.setVisibility(View.GONE);
-				if (rva != null) {
-					rva.changeCursor(result);
+				if (sca != null) {
+					sca.changeCursor(result);
 				} else {
-					rva = new SimpleCursorAdapter(
+					sca = new SimpleCursorAdapter(
 							SelectRoute.this,
 							R.layout.route_list_item,
 							result,
 							new String[] { Routes.RouteNumber, Routes.RouteName },
 							new int[] { android.R.id.text1, android.R.id.text2 });
 				}
-				setListAdapter(rva);
+				setListAdapter(sca);
 			}
 		}.execute();
 	}
@@ -155,14 +175,6 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 			dirintent.putExtra(SelectDirection.EXTRA_SYS, system);
 			startActivityForResult(dirintent, GET_DIRECTION);
 		}
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-			return true;
-		}
-		return super.onKeyDown(keyCode, event);
 	}
 
 	@Override

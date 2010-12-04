@@ -44,6 +44,9 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class StopPrediction extends ListActivity {
+	/**
+	 * The action which home screen shortcuts must have to be displayed by this activity.
+	 */
 	public static final String OPEN_STOP_ACTION = "net.neoturbine.autolycus.openstop";
 
 	private String system;
@@ -52,13 +55,16 @@ public class StopPrediction extends ListActivity {
 	private int stpid;
 	private String stpnm;
 
+	/**
+	 * Reference to the timer mechanism used to control the periodic updates.
+	 */
 	private volatile ScheduledExecutorService timer;
 
+	/**
+	 * If true, filter buses at this stop by those with the correct route number and direction.
+	 */
 	private boolean limitRoute = true;
 
-	/**
-	 * 
-	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,6 +85,9 @@ public class StopPrediction extends ListActivity {
 		loadIntent();
 	}
 
+	/**
+	 * Process the data from the current intent into local fields.
+	 */
 	private void loadIntent() {
 		final Intent intent = getIntent();
 
@@ -99,6 +108,9 @@ public class StopPrediction extends ListActivity {
 		loadIntent();
 	}
 
+	/**
+	 * Provide UI support for loading components of the stop information.
+	 */
 	private void loadStop() {
 		TextView titleView = (TextView) findViewById(R.id.txt_stop_name);
 		titleView.setText("Route " + route + ": " + stpnm);
@@ -112,6 +124,9 @@ public class StopPrediction extends ListActivity {
 		updatePredictions();
 	}
 
+	/**
+	 * 
+	 */
 	private void updatePredictions() {
 		if (timer != null)
 			timer.shutdown();

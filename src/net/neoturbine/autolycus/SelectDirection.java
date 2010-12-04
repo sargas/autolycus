@@ -32,20 +32,29 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.SimpleCursorAdapter;
 
+/**
+ * SelectDirection will allow the user to choose a direction provided it is
+ * passed the route and system name in an intent. Currently the only action upon
+ * selecting a direction is to request for a stop and pass this along to the
+ * calling activity.
+ * 
+ * @author Joseph Booker
+ * 
+ */
 public class SelectDirection extends ListActivity implements
 		OnItemClickListener {
 	public static final String EXTRA_RT = "net.neoturbine.autolycus.SelectDirection.ROUTE";
 	public static final String EXTRA_SYS = "net.neoturbine.autolycus.SelectDirection.SYSTEM";
 	public static final String TAG = "Autolycus";
 
+	/**
+	 * Request Code for passing to startActivityForResult.
+	 */
 	private static final int GET_STOP = 0;
 
-	// private ArrayList<String> directions;
-	// private Route route;
 	private String rt;
 	private String system;
 
-	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,6 +71,19 @@ public class SelectDirection extends ListActivity implements
 		}
 	}
 
+	/**
+	 * Fills this ListActivity with directions.
+	 * 
+	 * An AsyncTask is created to determine the proper directions. A ListAdapter
+	 * is created as needed, or the current one is changed to the cursor
+	 * returned by the query.
+	 * <p>
+	 * As a convenience for OSU TRIPS, if there is only one direction, the list
+	 * will be populated with the one and it is treated as if the only direction
+	 * is selected.
+	 * 
+	 * @see Directions
+	 */
 	private void loadDirections() {
 		getListView().setOnItemClickListener(this);
 
@@ -106,13 +128,11 @@ public class SelectDirection extends ListActivity implements
 							new int[] { android.R.id.text1 }));
 				}
 
-				// display afterwards, so we don't have a blank screen if the
-				// user hits back
 				if (result.getCount() == 1) {
 					result.moveToFirst();
 					String dir = result.getString(result
 							.getColumnIndexOrThrow(Directions.Direction));
-					startActivityForResult(getStopIntent(dir), GET_STOP);
+					getStopIntent(dir);
 				}
 			}
 		}.execute();
@@ -124,18 +144,23 @@ public class SelectDirection extends ListActivity implements
 			final Cursor c = (Cursor) parent.getItemAtPosition(position);
 			final String dir = c.getString(c
 					.getColumnIndexOrThrow(Directions.Direction));
-			startActivityForResult(getStopIntent(dir), GET_STOP);
+			getStopIntent(dir);
 		}
 	}
 
-	protected Intent getStopIntent(String direction) {
+	/**
+	 * Creates an intent to allow the user to pick a stop.
+	 * @param direction the direction which the user has selected.
+	 * @see SelectStop
+	 */
+	protected void getStopIntent(String direction) {
 		Intent forStop = new Intent(Intent.ACTION_PICK, Stops.CONTENT_URI);
 
 		forStop.putExtra(SelectStop.EXTRA_SYSTEM, system);
 		forStop.putExtra(SelectStop.EXTRA_ROUTE, rt);
 		forStop.putExtra(SelectStop.EXTRA_DIRECTION, direction);
 
-		return forStop;
+		startActivityForResult(forStop, GET_STOP);
 	}
 
 	@Override
