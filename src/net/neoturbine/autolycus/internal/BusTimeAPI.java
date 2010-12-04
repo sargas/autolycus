@@ -51,6 +51,9 @@ public final class BusTimeAPI {
 		} else if (system.equals("Ohio State University TRIP")) {
 			server = "trip.osu.edu";
 			key = "auixft7SWR3pWAcgkQfnfJpXt";
+		} else if (system.equals("MTA New York City Transit")) {
+			server = "bustime.mta.info";
+			key = "t7YxRNCmvVCfrZzrcMFeYegjp";
 		}
 
 		qparams.add(new BasicNameValuePair("key", key));

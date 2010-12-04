@@ -81,15 +81,9 @@ public class AutolycusProvider extends ContentProvider {
 					.append("' VARCHAR(255) UNIQUE").append(");");
 			db.execSQL(str.toString());
 
-			ContentValues cta = new ContentValues();
-			cta.put(Systems.Name, "Chicago Transit Authority");
-			cta.put(Systems.Abbrivation, "CTA");
-			db.insert(Systems.TABLE_NAME, null, cta);
-
-			ContentValues trip = new ContentValues();
-			trip.put(Systems.Name, "Ohio State University TRIP");
-			trip.put(Systems.Abbrivation, "OSU TRIP");
-			db.insert(Systems.TABLE_NAME, null, trip);
+			addSystem("Chicago Transit Authority","CTA",db);
+			addSystem("Ohio State University TRIP","OSU TRIP",db);
+			addSystem("MTA New York City Transit","MTA",db);
 
 			str = new StringBuilder();
 			str.append("CREATE TABLE ").append(Directions.TABLE_NAME)
@@ -115,6 +109,13 @@ public class AutolycusProvider extends ContentProvider {
 					.append(Stops.Latitude).append("' REAL, '")
 					.append(Stops.Expiration).append("' INTEGER").append(");");
 			db.execSQL(str.toString());
+		}
+		
+		private void addSystem(String name, String abbriv, SQLiteDatabase db) {
+			ContentValues cv = new ContentValues();
+			cv.put(Systems.Name, name);
+			cv.put(Systems.Abbrivation, abbriv);
+			db.insert(Systems.TABLE_NAME, null, cv);
 		}
 
 		@Override
