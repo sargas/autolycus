@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">Autolycus</string>
+	<string name="shortcut">Autolycus Bus Predictions</string>
 	<string name="shortcut_stopname">Name</string>
 	<string name="shortcut_stopnamehint">This will appear on the home screen.</string>
 	<string name="shortcut_submit">Create Shortcut</string>

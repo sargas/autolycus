@@ -1,6 +1,7 @@
 package net.neoturbine.autolycus;
 
 import net.neoturbine.autolycus.providers.AutolycusProvider;
+import net.neoturbine.autolycus.providers.Directions;
 import net.neoturbine.autolycus.providers.Routes;
 import net.neoturbine.autolycus.providers.Systems;
 import android.app.ListActivity;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -17,11 +19,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 public class SelectRoute extends ListActivity implements OnItemClickListener {
-	public static final String SELECT_ROUTE = "net.neoturbine.autolycus.SELECT_ROUTE";
 	private Spinner systemSpin;
 	private String system;
 	private SimpleCursorAdapter rva;
 	private TextView errorText;
+	
+	private static final int GET_DIRECTION = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -109,11 +112,29 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 		if(position >= 0) {
 			final Cursor c = (Cursor) parent.getItemAtPosition(position);
 			final String selectedRoute = c.getString(c.getColumnIndexOrThrow(Routes.RouteNumber));
-			final Intent dirintent = new Intent();
+			final Intent dirintent = new Intent(Intent.ACTION_PICK,Directions.CONTENT_URI);
 			dirintent.putExtra(SelectDirection.EXTRA_RT, selectedRoute);
 			dirintent.putExtra(SelectDirection.EXTRA_SYS, system);
-			setResult(RESULT_OK,dirintent);
-			finish();
+			startActivityForResult(dirintent, GET_DIRECTION);
+		}
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)  {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode,
+            Intent data) {
+		if(requestCode == GET_DIRECTION) {
+			if(resultCode == RESULT_OK) {
+				setResult(RESULT_OK,data);
+				finish();
+			}
 		}
 	}
 }

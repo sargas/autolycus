@@ -3,7 +3,7 @@
  */
 package net.neoturbine.autolycus;
 
-import net.neoturbine.autolycus.providers.Stops;
+import net.neoturbine.autolycus.providers.Routes;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,7 +33,7 @@ public class BusShortcuts extends Activity {
         final String action = intent.getAction();
 		
 		if (Intent.ACTION_CREATE_SHORTCUT.equals(action)) {
-			Intent stopintent = new Intent(Intent.ACTION_PICK,Stops.CONTENT_URI);
+			Intent stopintent = new Intent(Intent.ACTION_PICK,Routes.CONTENT_URI);
 			startActivityForResult(stopintent, PICK_STOP);
 		} else {
 			setResult(RESULT_CANCELED);

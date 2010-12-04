@@ -1,7 +1,6 @@
 package net.neoturbine.autolycus;
 
 import net.neoturbine.autolycus.providers.AutolycusProvider;
-import net.neoturbine.autolycus.providers.Directions;
 import net.neoturbine.autolycus.providers.Stops;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -16,7 +15,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class SelectStop extends ListActivity  implements OnItemClickListener{
-	public static final String SELECT_STOP = "net.neoturbine.autolycus.SELECT_STOP";
 	public static final String EXTRA_SYSTEM = "net.neoturbine.autolycus.SelectStop.SYSTEM";
 	public static final String EXTRA_ROUTE = "net.neoturbine.autolycus.SelectStop.ROUTE";
 	public static final String EXTRA_DIRECTION = "net.neoturbine.autolycus.SelectStop.DIRECTION";
@@ -28,8 +26,6 @@ public class SelectStop extends ListActivity  implements OnItemClickListener{
 	private String system;
 	private String route;
 	private String direction;
-	
-	private static final int PICK_DIRECTION = 0;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -41,8 +37,10 @@ public class SelectStop extends ListActivity  implements OnItemClickListener{
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
 		if(intent.getAction().equals(Intent.ACTION_PICK)) {
-			Intent dirintent = new Intent(Intent.ACTION_PICK,Directions.CONTENT_URI);
-			startActivityForResult(dirintent, PICK_DIRECTION);
+			system = intent.getStringExtra(EXTRA_SYSTEM);
+			route = intent.getStringExtra(EXTRA_ROUTE);
+			direction = intent.getStringExtra(EXTRA_DIRECTION);
+			loadStops();
 		}
 		this.getListView().setFastScrollEnabled(true);
 	}
@@ -92,20 +90,6 @@ public class SelectStop extends ListActivity  implements OnItemClickListener{
 				}
 			}
 		}.execute();
-	}
-	
-	@Override
-	public void onActivityResult(int requestCode, int resultCode,
-            Intent data) {
-		if(requestCode == PICK_DIRECTION) {
-			if(resultCode == RESULT_OK) {
-				system = data.getStringExtra(EXTRA_SYSTEM);
-				route = data.getStringExtra(EXTRA_ROUTE);
-				direction = data.getStringExtra(EXTRA_DIRECTION);
-
-				loadStops();
-			}
-		}
 	}
 
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {

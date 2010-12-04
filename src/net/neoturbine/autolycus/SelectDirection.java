@@ -2,7 +2,7 @@ package net.neoturbine.autolycus;
 
 import net.neoturbine.autolycus.providers.AutolycusProvider;
 import net.neoturbine.autolycus.providers.Directions;
-import net.neoturbine.autolycus.providers.Routes;
+import net.neoturbine.autolycus.providers.Stops;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,12 +17,11 @@ import android.widget.SimpleCursorAdapter;
 
 public class SelectDirection extends ListActivity implements
 		OnItemClickListener {
-	public static final String SELECT_DIRECTION = "net.neoturbine.autolycus.SELECT_DIRECTION";
 	public static final String EXTRA_RT = "net.neoturbine.autolycus.SelectDirection.ROUTE";
 	public static final String EXTRA_SYS = "net.neoturbine.autolycus.SelectDirection.SYSTEM";
 	public static final String TAG = "Autolycus";
 
-	private static final int PICK_ROUTE = 2;
+	private static final int GET_STOP = 0;
 
 	// private ArrayList<String> directions;
 	// private Route route;
@@ -40,9 +39,9 @@ public class SelectDirection extends ListActivity implements
 		final Intent intent = getIntent();
 
 		if (intent.getAction().equals(Intent.ACTION_PICK)) {
-			Intent routeintent = new Intent(Intent.ACTION_PICK,
-					Routes.CONTENT_URI);
-			startActivityForResult(routeintent, PICK_ROUTE);
+			rt = intent.getStringExtra(EXTRA_RT);
+			system = intent.getStringExtra(EXTRA_SYS);
+			loadDirections();
 		}
 	}
 
@@ -98,15 +97,13 @@ public class SelectDirection extends ListActivity implements
 			final Cursor c = (Cursor) parent.getItemAtPosition(position);
 			final String dir = c.getString(c
 					.getColumnIndexOrThrow(Directions.Direction));
-			setResult(RESULT_OK, getStop(dir));
-			finish();
+			startActivityForResult(getStopIntent(dir), GET_STOP);
 		}
 	}
 
-	protected Intent getStop(String direction) {
-		Intent forStop = new Intent();
-
-		forStop.setAction(SelectStop.SELECT_STOP);
+	protected Intent getStopIntent(String direction) {
+		Intent forStop = new Intent(Intent.ACTION_PICK,Stops.CONTENT_URI);
+		
 		forStop.putExtra(SelectStop.EXTRA_SYSTEM, system);
 		forStop.putExtra(SelectStop.EXTRA_ROUTE, rt);
 		forStop.putExtra(SelectStop.EXTRA_DIRECTION, direction);
@@ -115,11 +112,10 @@ public class SelectDirection extends ListActivity implements
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == PICK_ROUTE) {
+		if (requestCode == GET_STOP) {
 			if (resultCode == RESULT_OK) {
-				rt = data.getStringExtra(EXTRA_RT);
-				system = data.getStringExtra(EXTRA_SYS);
-				loadDirections();
+				setResult(RESULT_OK,data);
+				finish();
 			}
 		}
 	}
