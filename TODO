@@ -2,9 +2,9 @@ Before release:
 - Remove MTA if no response from email about broken API
 - README file
 
-Possible in release:
-- Finish Javadoc-ing
-
 After release:
+- Finish Javadoc-ing
 - Add 'View Map' to prediction context menu
 - Integrate service bulletins
+- Add UI for delayed buses
+- Transparent icon for home screen?

@@ -31,6 +31,6 @@
 	<string name="pref_clear_gone">Cache not found.</string>
 	
 	<string name="about_title">About Autolycus</string>
-	<string name="about_copyrights">Copyright 2010 Joseph Booker. Available under the GPLv3 at https://github.com/sargas/autolycus</string>
-	<string name="about_help">To use: From the home screen, press the Menu button. Choose \'Add\', and then choose the option to add \'Shortcuts\'. Autolycus Bus Predictions should be among the choices. Using folders in the home screen can organize multiple bus stops if you like.</string>
+	<string name="about_copyrights">Copyright 2010 Joseph Booker. Original bus icon from CKSInfo.com, modified. Available under the GPLv3 at https://github.com/sargas/autolycus</string>
+	<string name="about_help">To use: From the home screen, press the Menu button. Choose \'Add\', and then choose the option to add \'Shortcuts\'. Autolycus Bus Predictions should be among the choices. Use folders in the home screen to organize multiple bus stops.</string>
 </resources>
