@@ -180,8 +180,14 @@ public final class BusTimeAPI {
 				if (!curTag.equals("") && !text.equals("")) {
 					if (err != null)
 						err.setField(curTag, text);
-					else
-						directions.add(text);
+					else {
+						if(text.equals("Westbound"))
+							directions.add("West bound");
+						else if(text.equals("Eastbound"))
+							directions.add("East bound");
+						else
+							directions.add(text);
+					}
 				}
 				break;
 			case XmlPullParser.END_TAG:
@@ -216,8 +222,8 @@ public final class BusTimeAPI {
 						stops.add(curBuilder.toStopInfo());
 					}
 					curBuilder = new StopInfoBuilder(system);
-					curBuilder.setRoute(route);
-					curBuilder.setDir(direction);
+					curBuilder.setRoute(route); //do these get overriden?
+					curBuilder.setDir(direction); //ditto?
 				} else if (curTag.equals("error"))
 					err = new BusTimeError();
 				break;
@@ -226,8 +232,14 @@ public final class BusTimeAPI {
 				if (!curTag.equals("") && !text.equals("")) {
 					if (err != null) {
 						err.setField(curTag, text);
-					} else
-						curBuilder.setField(curTag, text);
+					} else {
+						if(text.equals("Eastbound"))
+							curBuilder.setField(curTag, "East bound");
+						else if (text.equals("Westbound"))
+							curBuilder.setField(curTag, "West bound");
+						else
+							curBuilder.setField(curTag, text);
+					}
 				}
 				break;
 			case XmlPullParser.END_TAG:
@@ -277,8 +289,14 @@ public final class BusTimeAPI {
 				if (!curTag.equals("") && !text.equals("")) {
 					if (err != null)
 						err.setField(curTag, text);
-					else
-						curBuilder.setField(curTag, text);
+					else {
+						if(text.equals("Eastbound"))
+							curBuilder.setField(curTag, "East bound");
+						else if (text.equals("Westbound"))
+							curBuilder.setField(curTag, "West bound");
+						else
+							curBuilder.setField(curTag, text);
+					}
 				}
 				break;
 			case XmlPullParser.END_TAG:

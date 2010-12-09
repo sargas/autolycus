@@ -1,5 +1,4 @@
 Before release:
-- Remove MTA if no response from email about broken API
 - README file
 
 After release:
@@ -8,3 +7,4 @@ After release:
 - Integrate service bulletins
 - Add UI for delayed buses
 - Transparent icon for home screen?
+- REMOVE UGLY HACK for mta's East+bound/Eastbound confusion when they fix their stuff
