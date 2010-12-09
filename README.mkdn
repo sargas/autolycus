@@ -1,0 +1,11 @@
+Autolycus
+================
+
+Autolycus is a simple program for viewing [Chicago Transit Authority (CTA)][CTA], [Ohio State University (TRIPS)][TRIPS], and [New York City Transit (MTA)][MTA] bus stop predictions from the Android home screen.
+
+See TODO file for current issues and future goals.
+
+All files copyrighted 2010 by Joseph Jon Booker and distributed under the GNU General Public License version 3 (see COPYING file), with the exception of the icons. The icons are based on <http://www.cksinfo.com/clipart/signssymbols/bwsigns/bus.png> and the modifications made do not impose any stricter conditions on their distribution or use.
+ [CTA]: http://ctabustracker.com/bustime/home.jsp
+ [TRIPS]: http://trip.osu.edu/bustime/home.jsp
+ [MTA]: http://bustime.mta.info/bustime/home.jsp
