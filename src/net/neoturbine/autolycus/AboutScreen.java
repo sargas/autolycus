@@ -31,6 +31,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 /**
+ * Simple screen to show copyright information and some directions.
+ * 
  * @author Joseph Booker
  * 
  */
@@ -39,7 +41,7 @@ public class AboutScreen extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.about);
 		setTitle(getString(R.string.about_title));
 
@@ -56,7 +58,7 @@ public class AboutScreen extends Activity {
 		}
 		appname.setText(getString(R.string.app_name) + " " + info.versionName);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -75,4 +77,3 @@ public class AboutScreen extends Activity {
 	}
 
 }
-

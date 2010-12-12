@@ -23,7 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class PredictionBuilder {
+final class PredictionBuilder {
 	private int predtype;
 	private String stopName;
 	private int stpid; // stop id

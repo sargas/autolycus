@@ -147,7 +147,6 @@ public class SelectRoute extends ListActivity implements OnItemClickListener {
 							AutolycusProvider.ERROR_MSG));
 					return;
 				}
-				// errorText.setVisibility(View.GONE);
 				if (sca != null) {
 					sca.changeCursor(result);
 				} else {

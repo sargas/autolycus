@@ -31,6 +31,14 @@ import android.widget.ArrayAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 
+/**
+ * SelectStop presents the user with choices of bus stops for a given route and
+ * direction combination. It is called with startActivityForResult and returns
+ * an intent containing the details of the stop.
+ * 
+ * @author Joseph Jon Booker
+ * 
+ */
 public class SelectStop extends ListActivity implements OnItemClickListener {
 	public static final String EXTRA_SYSTEM = "net.neoturbine.autolycus.SelectStop.SYSTEM";
 	public static final String EXTRA_ROUTE = "net.neoturbine.autolycus.SelectStop.ROUTE";
@@ -63,6 +71,7 @@ public class SelectStop extends ListActivity implements OnItemClickListener {
 
 	/**
 	 * Loads the stops from a background thread using an AsyncTask.
+	 * 
 	 * @see Stops
 	 */
 	private void loadStops() {

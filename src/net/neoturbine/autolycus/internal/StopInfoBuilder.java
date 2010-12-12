@@ -21,7 +21,7 @@ import java.io.Serializable;
 import android.util.Log;
 
 //final for efficiency
-public final class StopInfoBuilder implements Serializable {
+final class StopInfoBuilder implements Serializable {
 	private static final long serialVersionUID = -6247913982038105829L;
 	private String system;
 	private String rt;

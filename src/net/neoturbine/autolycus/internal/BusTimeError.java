@@ -19,7 +19,7 @@ package net.neoturbine.autolycus.internal;
 
 import android.util.Log;
 
-public class BusTimeError extends Exception {
+public final class BusTimeError extends Exception {
 	private static final long serialVersionUID = 5903785755487896094L;
 	// add fields as they become possible in used api calls
 	private String msg;

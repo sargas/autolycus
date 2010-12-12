@@ -25,7 +25,7 @@ import android.util.Log;
  * @author joe
  * 
  */
-public final class RouteBuilder implements Serializable {
+final class RouteBuilder implements Serializable {
 	private transient static final long serialVersionUID = -8565655247745002659L;
 	private transient static final String TAG = "Autolycus";
 	private String name; // name of the route

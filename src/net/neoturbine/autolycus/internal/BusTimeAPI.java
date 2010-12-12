@@ -40,14 +40,46 @@ import android.os.Bundle;
 import android.util.Log;
 
 /**
+ * A static wrapper for the API calls exposed by the BusTime protocol from Clear
+ * Devices. This only uses objects from the Android API and this package.
+ * Currently only works with version 1.0.
+ * 
+ * Currently implements a very ugly hack. If "Eastbound" or "Westbound" is found
+ * in the API, this is replaced with "East bound" or "West bound." This is due
+ * to a bug in MTA's implementation of BusTime.
+ * 
  * @author Joseph Booker
+ * @see BusTimeError
  * 
  */
 public final class BusTimeAPI {
+	private BusTimeAPI() {
+	}
+
 	private static final String TAG = "Autolycus";
 
-	// important: run this in its own thread!!!
-	public static XmlPullParser loadData(Context context, String verb,
+	/**
+	 * Requests the XML data for a given action and parameters. Matches the
+	 * <code>system</code> input with a hard-coded internal list to know which
+	 * server to use. Note that this MUST not be run in the UI thread.
+	 * 
+	 * @param context
+	 *            Currently unused, but needed for analytics.
+	 * @param verb
+	 *            The string in the last part of the Base URL within the API
+	 *            documentation.
+	 * @param system
+	 *            One of the internally supported transit systems.
+	 * @param params
+	 *            a Bundle containing the parameters to be passed within its
+	 *            extras.
+	 * @return an XmlPullParser with the XML tree resulting from this API call.
+	 * 
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws XmlPullParserException
+	 */
+	private static XmlPullParser loadData(Context context, String verb,
 			String system, Bundle params) throws ClientProtocolException,
 			IOException, XmlPullParserException {
 		ArrayList<NameValuePair> qparams = new ArrayList<NameValuePair>();
@@ -104,6 +136,19 @@ public final class BusTimeAPI {
 		return xpp;
 	}
 
+	/**
+	 * Retrieves the list of routes for a given System.
+	 * 
+	 * @see Route
+	 * @param context
+	 *            Currently unused, but needed for analytics.
+	 * @param system
+	 *            One of the internally supported transit systems.
+	 * @return an ArrayList of Route objects.
+	 * @throws BusTimeError
+	 *             indicating the API returned an error
+	 * @throws Exception
+	 */
 	public static ArrayList<Route> getRoutes(Context context, String system)
 			throws Exception {
 		ArrayList<Route> routes = new ArrayList<Route>();
@@ -153,6 +198,20 @@ public final class BusTimeAPI {
 		return routes;
 	}
 
+	/**
+	 * Retrieves the list of directions for a given route in a system.
+	 * 
+	 * @param context
+	 *            Currently unused, but needed for analytics.
+	 * @param system
+	 *            One of the internally supported transit systems.
+	 * @param route
+	 *            the route designator to see supported directions.
+	 * @return an ArrayList containing the directions as strings.
+	 * @throws BusTimeError
+	 *             indicating the API returned an error
+	 * @throws Exception
+	 */
 	public static ArrayList<String> getDirections(Context context,
 			String system, String route) throws Exception {
 		// we don't check the date of the cache since we're going to assume
@@ -181,9 +240,9 @@ public final class BusTimeAPI {
 					if (err != null)
 						err.setField(curTag, text);
 					else {
-						if(text.equals("Westbound"))
+						if (text.equals("Westbound"))
 							directions.add("West bound");
-						else if(text.equals("Eastbound"))
+						else if (text.equals("Eastbound"))
 							directions.add("East bound");
 						else
 							directions.add(text);
@@ -201,6 +260,23 @@ public final class BusTimeAPI {
 		return directions;
 	}
 
+	/**
+	 * Retrieves the list of stops for a given route and direction in a system.
+	 * 
+	 * @see StopInfo
+	 * @param context
+	 *            Currently unused, but needed for analytics.
+	 * @param system
+	 *            One of the internally supported transit systems.
+	 * @param route
+	 *            the route designator.
+	 * @param direction
+	 *            the string containing the direction returned by the API.
+	 * @return an ArrayList of StopInfo objects for each stop.
+	 * @throws BusTimeError
+	 *             indicating the API returned an error.
+	 * @throws Exception
+	 */
 	public static ArrayList<StopInfo> getStops(Context context, String system,
 			String route, String direction) throws Exception {
 		ArrayList<StopInfo> stops = new ArrayList<StopInfo>();
@@ -222,8 +298,8 @@ public final class BusTimeAPI {
 						stops.add(curBuilder.toStopInfo());
 					}
 					curBuilder = new StopInfoBuilder(system);
-					curBuilder.setRoute(route); //do these get overriden?
-					curBuilder.setDir(direction); //ditto?
+					curBuilder.setRoute(route); // do these get overriden?
+					curBuilder.setDir(direction); // ditto?
 				} else if (curTag.equals("error"))
 					err = new BusTimeError();
 				break;
@@ -233,7 +309,7 @@ public final class BusTimeAPI {
 					if (err != null) {
 						err.setField(curTag, text);
 					} else {
-						if(text.equals("Eastbound"))
+						if (text.equals("Eastbound"))
 							curBuilder.setField(curTag, "East bound");
 						else if (text.equals("Westbound"))
 							curBuilder.setField(curTag, "West bound");
@@ -258,6 +334,26 @@ public final class BusTimeAPI {
 		return stops;
 	}
 
+	/**
+	 * Retrieves the arrival time predictions for the given Stop ID in a given
+	 * transit system.
+	 * 
+	 * @see Prediction
+	 * @param context
+	 *            Currently unused, but needed for analytics.
+	 * @param system
+	 *            One of the internally supported transit systems.
+	 * @param stopID
+	 *            the string containing the direction returned by the API.
+	 * @param route
+	 *            optionally limit the predictions at this stop for a this
+	 *            route.
+	 * @return an ArrayList of all predictions returned by the API. May be empty
+	 *         with no error if there is no predictions at this time.
+	 * @throws BusTimeError
+	 *             indicating the API returned an error
+	 * @throws Exception
+	 */
 	public static ArrayList<Prediction> getPrediction(Context context,
 			String system, String stopID, String route) throws Exception {
 		ArrayList<Prediction> preds = new ArrayList<Prediction>();
@@ -290,7 +386,7 @@ public final class BusTimeAPI {
 					if (err != null)
 						err.setField(curTag, text);
 					else {
-						if(text.equals("Eastbound"))
+						if (text.equals("Eastbound"))
 							curBuilder.setField(curTag, "East bound");
 						else if (text.equals("Westbound"))
 							curBuilder.setField(curTag, "West bound");

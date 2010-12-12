@@ -41,6 +41,16 @@ import android.widget.CheckBox;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+/**
+ * StopPrediction will show the latest predictions for a given stop, updating as
+ * often as the user specifies in the preferences. It reads the information
+ * about the stop (and the specific route and direction) from an intent with the
+ * EXTRA_ fields of SelectStop
+ * 
+ * @author Joseph Booker
+ * @see SelectStop
+ * 
+ */
 public class StopPrediction extends ListActivity {
 	/**
 	 * The action which home screen shortcuts must have to be displayed by this
@@ -58,6 +68,12 @@ public class StopPrediction extends ListActivity {
 	private String direction;
 	private int stpid;
 	private String stpnm;
+
+	/**
+	 * Gives the time of the last time a request for current predictions was
+	 * made. We need to know the time of the previous prediction to avoid
+	 * getting more over the network too often.
+	 */
 	private long previousPrediction = -1;
 
 	/**
@@ -142,6 +158,7 @@ public class StopPrediction extends ListActivity {
 	 * to retrieve new stop predictions.
 	 */
 	private Runnable updateViewsTask = new Runnable() {
+		@Override
 		public void run() {
 			final long currentTime = System.currentTimeMillis();
 			final int delay = Integer
@@ -155,7 +172,7 @@ public class StopPrediction extends ListActivity {
 				new updatePredictionsTask().execute();
 			} else {
 				android.util.Log.v("StopPrediction", "Redrawing");
-				((BaseAdapter)getListAdapter()).notifyDataSetChanged();
+				((BaseAdapter) getListAdapter()).notifyDataSetChanged();
 				final long timeTillUpdate = delay * 1000
 						- (currentTime - previousPrediction);
 				if (timeTillUpdate < PREDICTION_DRAWING_DELAY)

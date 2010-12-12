@@ -20,7 +20,7 @@ package net.neoturbine.autolycus.internal;
 import java.io.Serializable;
 
 /**
- * @author joe
+ * @author Joseph Jon Booker
  * 
  */
 public final class Route implements Serializable {
