@@ -5,10 +5,12 @@
   android:layout_height="wrap_content">
   
   <TextView
-   android:layout_width="fill_parent"
+   android:layout_width="wrap_content"
    android:layout_height="wrap_content" 
    android:layout_alignParentTop="true"
+   android:layout_alignParentLeft="true"
    android:id="@+id/predictionview_timeview"
+   android:layout_alignRight="@+id/predictionview_dly"
    android:textSize="20sp"
    android:text="Time" />
    
@@ -17,6 +19,19 @@
    android:layout_height="wrap_content"
    android:layout_below="@+id/predictionview_timeview"
    android:layout_alignLeft="@+id/predictionview_timeview"
+   android:layout_alignRight="@+id/predictionview_dly"
+   android:layout_alignParentBottom="true"
+   android:layout_alignParentLeft="true"
    android:id="@+id/predictionview_routeview"
    android:text="route" />
+  <TextView
+   android:layout_width="wrap_content"
+   android:layout_height="wrap_content"
+   android:layout_alignParentRight="true"
+   android:ellipsize="marquee"
+   android:id="@+id/predictionview_dly"
+   android:gravity="right"
+   android:visibility="gone"
+   android:text="@string/predictionview_delayed"
+   android:textColor="#FF0000"/>
 </RelativeLayout>

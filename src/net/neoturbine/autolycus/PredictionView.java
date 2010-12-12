@@ -18,7 +18,6 @@
 package net.neoturbine.autolycus;
 
 import java.text.SimpleDateFormat;
-import net.neoturbine.autolycus.internal.PredictionBuilder;
 import net.neoturbine.autolycus.providers.Predictions;
 import android.content.Context;
 import android.database.Cursor;
@@ -53,8 +52,11 @@ public class PredictionView extends LinearLayout {
 
 	private TextView timeView;
 
+	private TextView delayedView;
+
 	/**
 	 * SimpleDateFormat for displaying the time.
+	 * 
 	 * @see #prettyTime(long)
 	 */
 	private static final SimpleDateFormat formatter = new SimpleDateFormat(
@@ -87,6 +89,9 @@ public class PredictionView extends LinearLayout {
 				.findViewById(R.id.predictionview_timeview);
 		routeView = (TextView) rellayout
 				.findViewById(R.id.predictionview_routeview);
+
+		delayedView = (TextView) rellayout
+				.findViewById(R.id.predictionview_dly);
 	}
 
 	/**
@@ -99,13 +104,13 @@ public class PredictionView extends LinearLayout {
 				.getColumnIndexOrThrow(Predictions.Destination));
 
 		updateTimes();
-		
+
 		if (stopinfo)
 			routeView.setText(route + " - To " + dest);
 		else
 			routeView.setText("To " + dest);
 	}
-	
+
 	/**
 	 * Updates the relative times within this view.
 	 */
@@ -114,19 +119,19 @@ public class PredictionView extends LinearLayout {
 				.getColumnIndexOrThrow(Predictions.EstimatedTime));
 		int predType = pred
 				.getInt(pred.getColumnIndexOrThrow(Predictions.Type));
-		
-		if(System.currentTimeMillis() > estTime) {
+
+		if (System.currentTimeMillis() > estTime) {
 			setVisibility(GONE);
 			return;
 		} else
 			setVisibility(VISIBLE);
-		
+		if (Boolean.parseBoolean(pred.getString(pred
+				.getColumnIndexOrThrow(Predictions.isDelayed))))
+			delayedView.setVisibility(View.VISIBLE);
+
 		if (Math.abs(System.currentTimeMillis() - estTime) < 60 * 1000) {
-			if (predType == PredictionBuilder.ARRIVAL_PREDICTION)
-				timeView.setText(prettyTime(estTime) + " - Arriving now!");
-			else
-				// departure
-				timeView.setText(prettyTime(estTime) + " - Departing now!");
+			timeView.setText(prettyTime(estTime) + " - "
+					+ Predictions.typeToVerb(predType) + " now!");
 		} else { // more then a minute left
 			timeView.setText(prettyTime(estTime)
 					+ " - "
@@ -138,8 +143,11 @@ public class PredictionView extends LinearLayout {
 
 	/**
 	 * Changes the cursor used for this view.
-	 * @param pred the row to get the prediction information from
-	 * @param showRoute determines if the route is displayed
+	 * 
+	 * @param pred
+	 *            the row to get the prediction information from
+	 * @param showRoute
+	 *            determines if the route is displayed
 	 */
 	public void setPrediction(Cursor pred, boolean showRoute) {
 		this.pred = pred;
@@ -149,7 +157,9 @@ public class PredictionView extends LinearLayout {
 
 	/**
 	 * Formats a time stamp as a localized string
-	 * @param time the number milliseconds since January 1, 1970.
+	 * 
+	 * @param time
+	 *            the number milliseconds since January 1, 1970.
 	 * @return a representation of the time as "hh:mm a"
 	 */
 	public static String prettyTime(long time) {
@@ -157,9 +167,9 @@ public class PredictionView extends LinearLayout {
 	}
 
 	@Override
-	protected void onDraw (Canvas canvas) {
+	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		
+
 		updateTimes();
 	}
 }

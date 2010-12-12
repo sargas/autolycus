@@ -2,6 +2,6 @@ After release:
 - Finish Javadoc-ing
 - Add 'View Map' to prediction context menu
 - Integrate service bulletins
-- Add UI for delayed buses
 - Transparent icon for home screen?
 - REMOVE UGLY HACK for mta's East+bound/Eastbound confusion when they fix their stuff
+- proper way of collapsing old predictions

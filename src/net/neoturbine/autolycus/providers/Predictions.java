@@ -55,7 +55,7 @@ public class Predictions implements BaseColumns {
 			Direction, StopID, StopName, VehicleID, DistanceToStop, isDelayed,
 			Destination, Type, EstimatedTime, PredictionTime };
 
-	public static String typeToString(String type) {
+	public static String typeToNoun(String type) {
 		if (type.equals(Integer.toString(Prediction.ARRIVAL_PREDICTION)))
 			return "Arrival";
 		else if (type.equals(Integer.toString(Prediction.DEPARTURE_PREDICTION)))
@@ -63,4 +63,15 @@ public class Predictions implements BaseColumns {
 		return null;
 	}
 
+	public static String typeToVerb(int type) {
+		if(type == Prediction.ARRIVAL_PREDICTION)
+			return "Arriving";
+		else if (type == Prediction.DEPARTURE_PREDICTION)
+			return "Departing";
+		return null;
+	}
+
+	public static String typeToVerb(String type) {
+		return typeToVerb(Integer.parseInt(type));
+	}
 }

@@ -297,7 +297,7 @@ public class StopPrediction extends ListActivity {
 					.setText(c.getString(c
 							.getColumnIndexOrThrow(Predictions.Destination)));
 			((TextView) dialog.findViewById(R.id.prediction_detail_type))
-					.setText(Predictions.typeToString(c.getString(c
+					.setText(Predictions.typeToNoun(c.getString(c
 							.getColumnIndexOrThrow(Predictions.Type))));
 			((TextView) dialog.findViewById(R.id.prediction_detail_stpid))
 					.setText(c.getString(c
