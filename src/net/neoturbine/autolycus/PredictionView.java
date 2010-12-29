@@ -125,9 +125,12 @@ public class PredictionView extends LinearLayout {
 			return;
 		} else
 			setVisibility(VISIBLE);
+
 		if (Boolean.parseBoolean(pred.getString(pred
 				.getColumnIndexOrThrow(Predictions.isDelayed))))
 			delayedView.setVisibility(View.VISIBLE);
+		else
+			delayedView.setVisibility(View.GONE);
 
 		if (Math.abs(System.currentTimeMillis() - estTime) < 60 * 1000) {
 			timeView.setText(prettyTime(estTime) + " - "
