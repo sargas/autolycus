@@ -12,9 +12,9 @@
 	<string name="menu_update">Update Now</string>
 	<string name="menu_details">Details</string>
 	
-	<string name="prefs_delay_detail">Time in seconds (0 to disable, must be greater then 30)</string>
+	<string name="prefs_delay_detail">Time in seconds (0 to disable, must be greater then 60)</string>
 	<string name="prefs_delay">Frequency of Prediction Updates</string>
-	<string name="prefs_delay_error">Frequency set is too short (setting to 30 seconds)</string>
+	<string name="prefs_delay_error">Frequency set is too short.</string>
 	<string name="prefs_defaultsys">Default Transit System</string>
 	
 	<!--  window titles -->

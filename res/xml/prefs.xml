@@ -3,7 +3,7 @@
 
 <ListPreference android:title="@string/prefs_defaultsys" android:key="default_system"></ListPreference><EditTextPreference android:summary="@string/prefs_delay_detail"
 	android:title="@string/prefs_delay" android:key="update_delay"
-	android:inputType="number" android:defaultValue="60" 
+	android:inputType="number" android:defaultValue="90"
 	android:numeric="integer" android:persistent="true" />
 
 <net.neoturbine.autolycus.prefs.ClearCachePreference />
