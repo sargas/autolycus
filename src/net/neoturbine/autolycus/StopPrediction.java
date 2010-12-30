@@ -171,7 +171,6 @@ public class StopPrediction extends ListActivity {
 			if (currentTime - previousPrediction > delay * 1000) {
 				new updatePredictionsTask().execute();
 			} else {
-				android.util.Log.v("StopPrediction", "Redrawing");
 				((BaseAdapter) getListAdapter()).notifyDataSetChanged();
 				final long timeTillUpdate = delay * 1000
 						- (currentTime - previousPrediction);
