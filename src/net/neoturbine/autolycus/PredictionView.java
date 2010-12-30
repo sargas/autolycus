@@ -26,7 +26,7 @@ import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -38,7 +38,7 @@ import android.widget.TextView;
  * @author Joseph Booker
  * 
  */
-public class PredictionView extends LinearLayout {
+public class PredictionView extends RelativeLayout {
 	/**
 	 * Cursor at the row containing the information we are displaying.
 	 */
@@ -115,16 +115,21 @@ public class PredictionView extends LinearLayout {
 	 * Updates the relative times within this view.
 	 */
 	public void updateTimes() {
-		long estTime = pred.getLong(pred
+		final long estTime = pred.getLong(pred
 				.getColumnIndexOrThrow(Predictions.EstimatedTime));
-		int predType = pred
+		final int predType = pred
 				.getInt(pred.getColumnIndexOrThrow(Predictions.Type));
 
 		if (System.currentTimeMillis() > estTime) {
+			for(int i=0;i<getChildCount();++i)
+				this.getChildAt(i).setVisibility(View.GONE);
 			setVisibility(GONE);
 			return;
-		} else
+		} else {
+			for(int i=0;i<getChildCount();++i)
+				this.getChildAt(i).setVisibility(View.VISIBLE);
 			setVisibility(VISIBLE);
+		}
 
 		if (Boolean.parseBoolean(pred.getString(pred
 				.getColumnIndexOrThrow(Predictions.isDelayed))))
