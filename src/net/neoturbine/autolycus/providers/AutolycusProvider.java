@@ -48,7 +48,7 @@ public class AutolycusProvider extends ContentProvider {
 	public static final String ERROR_MSG = "error";
 
 	public static final String DATABASE_NAME = "cache.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	private static final UriMatcher uriMatcher;
 	private static final int URI_ROUTES = 1;
@@ -72,8 +72,6 @@ public class AutolycusProvider extends ContentProvider {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			// TODO (potentially): convert to specialized methods in
-			// SQLiteDatabase
 			StringBuilder str = new StringBuilder();
 			str.append("CREATE TABLE ").append(Routes.TABLE_NAME).append(" ('")
 					.append(Routes._ID)
@@ -91,13 +89,14 @@ public class AutolycusProvider extends ContentProvider {
 					.append(Systems._ID)
 					.append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
 					.append(Systems.Name).append("' VARCHAR(255) UNIQUE, '")
+					.append(Systems.TimeZone).append("' VARCHAR(255), '")
 					.append(Systems.Abbrivation)
 					.append("' VARCHAR(255) UNIQUE").append(");");
 			db.execSQL(str.toString());
 
-			addSystem("Chicago Transit Authority", "CTA", db);
-			addSystem("Ohio State University TRIP", "OSU TRIP", db);
-			addSystem("MTA New York City Transit", "MTA", db);
+			addSystem("Chicago Transit Authority", "CTA", "America/Chicago", db);
+			addSystem("Ohio State University TRIP", "OSU TRIP", "America/New_York", db);
+			addSystem("MTA New York City Transit", "MTA", "America/New_York", db);
 
 			str = new StringBuilder();
 			str.append("CREATE TABLE ").append(Directions.TABLE_NAME)
@@ -125,17 +124,27 @@ public class AutolycusProvider extends ContentProvider {
 			db.execSQL(str.toString());
 		}
 
-		private void addSystem(String name, String abbriv, SQLiteDatabase db) {
+		private void addSystem(String name, String abbriv, String timezone, SQLiteDatabase db) {
 			ContentValues cv = new ContentValues();
 			cv.put(Systems.Name, name);
 			cv.put(Systems.Abbrivation, abbriv);
+			cv.put(Systems.TimeZone, timezone);
 			db.insert(Systems.TABLE_NAME, null, cv);
 		}
 
+		/**
+		 * Wipes database and recreates it. No need for anything persistant in the cache.
+		 */
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
 					+ newVersion + ", which will destroy all old data");
+			
+			db.execSQL("DROP TABLE IF EXISTS "+Systems.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS "+Routes.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS "+Directions.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS "+Stops.TABLE_NAME);
+
 			onCreate(db);
 		}
 	}

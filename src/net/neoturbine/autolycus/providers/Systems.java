@@ -36,4 +36,5 @@ public final class Systems implements BaseColumns {
 	
 	public static final String Name = "name";
 	public static final String Abbrivation = "abbriv";
+	public static final String TimeZone = "timezone";
 }
