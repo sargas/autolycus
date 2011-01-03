@@ -1,4 +1,3 @@
-After release:
 - Finish Javadoc-ing
 - Add 'View Map' to prediction context menu
 - Integrate service bulletins
@@ -7,3 +6,5 @@ After release:
 - Change AsyncTask to AsyncQueryHandler where appriorite
 - Use https://code.google.com/p/zippy-android/source/browse/trunk/examples/SharedPreferencesCompat.java
 - Use reflection + strictmode, test in gingerbread emulator (perhaps goo.gl/UXzAj may apply)
+- Add information for each transit system to about screen (potentially from db?)
+- fill systems table with string array resources (and use these in BusTimeAPI)
