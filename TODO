@@ -1,5 +1,4 @@
 After release:
-- Take into account time zone differences (i.e., show correct times for different time zones)
 - Finish Javadoc-ing
 - Add 'View Map' to prediction context menu
 - Integrate service bulletins

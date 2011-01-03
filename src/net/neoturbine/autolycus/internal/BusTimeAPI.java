@@ -355,13 +355,13 @@ public final class BusTimeAPI {
 	 * @throws Exception
 	 */
 	public static ArrayList<Prediction> getPrediction(Context context,
-			String system, String stopID, String route) throws Exception {
+			String system, String stopID, String route, String timeZone) throws Exception {
 		ArrayList<Prediction> preds = new ArrayList<Prediction>();
 		Bundle params = new Bundle();
 		params.putString("stpid", stopID);
 		if (route != null)
 			params.putString("rt", route);
-		PredictionBuilder curBuilder = new PredictionBuilder();
+		PredictionBuilder curBuilder = new PredictionBuilder(timeZone);
 		XmlPullParser xpp = BusTimeAPI.loadData(context, "getpredictions",
 				system, params);
 		int eventType = xpp.getEventType();
@@ -375,7 +375,7 @@ public final class BusTimeAPI {
 					if (curBuilder.isSet()) {
 						preds.add(curBuilder.toPrediction());
 					}
-					curBuilder = new PredictionBuilder();
+					curBuilder = new PredictionBuilder(timeZone);
 				} else if (curTag.equals("error")) {
 					err = new BusTimeError();
 				}

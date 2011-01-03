@@ -398,8 +398,18 @@ public class AutolycusProvider extends ContentProvider {
 			}
 		};
 		try {
+			// Get our system for the time zone information
+			Cursor sysCur = query(Systems.CONTENT_URI,
+						new String[] {Systems.TimeZone},
+						Systems.Name +" = ?",
+						new String[] {system}, null);
+
+			sysCur.moveToFirst();
+			final String timeZone = sysCur.getString(sysCur.getColumnIndex(Systems.TimeZone));
+			sysCur.close();
+
 			ArrayList<Prediction> preds = BusTimeAPI.getPrediction(
-					getContext(), system, stpid, route);
+					getContext(), system, stpid, route, timeZone);
 			int i = 0;
 			for (Prediction pred : preds) {
 				if (dir != null)
