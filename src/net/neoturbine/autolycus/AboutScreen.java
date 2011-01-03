@@ -17,6 +17,10 @@
  */
 package net.neoturbine.autolycus;
 
+import java.util.ArrayList;
+
+import net.neoturbine.autolycus.internal.BusTimeAPI;
+import net.neoturbine.autolycus.internal.ServiceBulletin;
 import net.neoturbine.autolycus.prefs.Prefs;
 import android.app.Activity;
 import android.content.Intent;
@@ -25,6 +29,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,6 +62,14 @@ public class AboutScreen extends Activity {
 			return;
 		}
 		appname.setText(getString(R.string.app_name) + " " + info.versionName);
+		
+		try {
+			ArrayList<ServiceBulletin> list = BusTimeAPI.getServiceBulletinsContext(this, "Chicago Transit Authority", "1102");
+			for(ServiceBulletin l : list)
+				Log.w("ServiceBulletins", l.toString());
+		} catch (Exception e) {
+			android.util.Log.w("ServiceBulletins","Got exception: "+e);
+		}
 	}
 
 	@Override
