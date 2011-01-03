@@ -23,6 +23,7 @@ import java.util.Date;
 import net.neoturbine.autolycus.internal.BusTimeAPI;
 import net.neoturbine.autolycus.internal.Prediction;
 import net.neoturbine.autolycus.internal.Route;
+import net.neoturbine.autolycus.internal.ServiceBulletin;
 import net.neoturbine.autolycus.internal.StopInfo;
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -48,7 +49,7 @@ public class AutolycusProvider extends ContentProvider {
 	public static final String ERROR_MSG = "error";
 
 	public static final String DATABASE_NAME = "cache.db";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 
 	private static final UriMatcher uriMatcher;
 	private static final int URI_ROUTES = 1;
@@ -56,6 +57,7 @@ public class AutolycusProvider extends ContentProvider {
 	private static final int URI_DIRECTIONS = 3;
 	private static final int URI_STOPS = 4;
 	private static final int URI_PREDICTIONS = 5;
+	private static final int URI_BULLETINS = 6;
 	static {
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		uriMatcher.addURI(AUTHORITY, Routes.TABLE_NAME, URI_ROUTES);
@@ -63,6 +65,8 @@ public class AutolycusProvider extends ContentProvider {
 		uriMatcher.addURI(AUTHORITY, Directions.TABLE_NAME, URI_DIRECTIONS);
 		uriMatcher.addURI(AUTHORITY, Stops.TABLE_NAME, URI_STOPS);
 		uriMatcher.addURI(AUTHORITY, Predictions.TABLE_NAME, URI_PREDICTIONS);
+		uriMatcher
+				.addURI(AUTHORITY, ServiceBulletins.TABLE_NAME, URI_BULLETINS);
 	}
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
@@ -95,8 +99,10 @@ public class AutolycusProvider extends ContentProvider {
 			db.execSQL(str.toString());
 
 			addSystem("Chicago Transit Authority", "CTA", "America/Chicago", db);
-			addSystem("Ohio State University TRIP", "OSU TRIP", "America/New_York", db);
-			addSystem("MTA New York City Transit", "MTA", "America/New_York", db);
+			addSystem("Ohio State University TRIP", "OSU TRIP",
+					"America/New_York", db);
+			addSystem("MTA New York City Transit", "MTA", "America/New_York",
+					db);
 
 			str = new StringBuilder();
 			str.append("CREATE TABLE ").append(Directions.TABLE_NAME)
@@ -122,9 +128,28 @@ public class AutolycusProvider extends ContentProvider {
 					.append(Stops.Latitude).append("' REAL, '")
 					.append(Stops.Expiration).append("' INTEGER").append(");");
 			db.execSQL(str.toString());
+
+			str = new StringBuilder();
+			str.append("CREATE TABLE ").append(ServiceBulletins.TABLE_NAME)
+					.append(" ( ").append(ServiceBulletins._ID)
+					.append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
+					.append(ServiceBulletins.System)
+					.append("' VARCHAR(255), '").append(ServiceBulletins.Name)
+					.append("' VARCHAR(255), '")
+					.append(ServiceBulletins.Subject)
+					.append("' VARCHAR(255), '")
+					.append(ServiceBulletins.Detail)
+					.append("' VARCHAR (255), '")
+					.append(ServiceBulletins.Brief).append("' VARCHAR(255), '")
+					.append(ServiceBulletins.Priority)
+					.append("' VARCHAR(8), '").append(ServiceBulletins.ForStop)
+					.append("' INTEGER, '").append(Stops.Expiration)
+					.append("' INTEGER").append(");");
+			db.execSQL(str.toString());
 		}
 
-		private void addSystem(String name, String abbriv, String timezone, SQLiteDatabase db) {
+		private void addSystem(String name, String abbriv, String timezone,
+				SQLiteDatabase db) {
 			ContentValues cv = new ContentValues();
 			cv.put(Systems.Name, name);
 			cv.put(Systems.Abbrivation, abbriv);
@@ -133,17 +158,19 @@ public class AutolycusProvider extends ContentProvider {
 		}
 
 		/**
-		 * Wipes database and recreates it. No need for anything persistant in the cache.
+		 * Wipes database and recreates it. No need for anything persistent in
+		 * the cache.
 		 */
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
 					+ newVersion + ", which will destroy all old data");
-			
-			db.execSQL("DROP TABLE IF EXISTS "+Systems.TABLE_NAME);
-			db.execSQL("DROP TABLE IF EXISTS "+Routes.TABLE_NAME);
-			db.execSQL("DROP TABLE IF EXISTS "+Directions.TABLE_NAME);
-			db.execSQL("DROP TABLE IF EXISTS "+Stops.TABLE_NAME);
+
+			db.execSQL("DROP TABLE IF EXISTS " + Systems.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS " + Routes.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS " + Directions.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS " + Stops.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS " + ServiceBulletins.TABLE_NAME);
 
 			onCreate(db);
 		}
@@ -181,6 +208,8 @@ public class AutolycusProvider extends ContentProvider {
 			return Stops.CONTENT_TYPE;
 		case URI_PREDICTIONS:
 			return Predictions.CONTENT_TYPE;
+		case URI_BULLETINS:
+			return ServiceBulletins.CONTENT_TYPE;
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
@@ -246,6 +275,12 @@ public class AutolycusProvider extends ContentProvider {
 				return fetchPreds(selectionArgs[0], selectionArgs[1],
 						selectionArgs.length < 3 ? null : selectionArgs[2],
 						selectionArgs.length < 4 ? null : selectionArgs[3]);
+			case URI_BULLETINS:
+				qb.setTables(ServiceBulletins.TABLE_NAME);
+				// selection should be
+				// 'system=? forstop=?'
+				fetchBulletins(selectionArgs[0], selectionArgs[1]);
+				break;
 			default:
 				throw new IllegalArgumentException("Unknown URI " + uri);
 			}
@@ -400,12 +435,12 @@ public class AutolycusProvider extends ContentProvider {
 		try {
 			// Get our system for the time zone information
 			Cursor sysCur = query(Systems.CONTENT_URI,
-						new String[] {Systems.TimeZone},
-						Systems.Name +" = ?",
-						new String[] {system}, null);
+					new String[] { Systems.TimeZone }, Systems.Name + " = ?",
+					new String[] { system }, null);
 
 			sysCur.moveToFirst();
-			final String timeZone = sysCur.getString(sysCur.getColumnIndex(Systems.TimeZone));
+			final String timeZone = sysCur.getString(sysCur
+					.getColumnIndex(Systems.TimeZone));
 			sysCur.close();
 
 			ArrayList<Prediction> preds = BusTimeAPI.getPrediction(
@@ -434,6 +469,48 @@ public class AutolycusProvider extends ContentProvider {
 			cur.getExtras().putString(ERROR_MSG, e.getMessage());
 		}
 		return cur;
+	}
+
+	private void fetchBulletins(String system, String stpid)
+			throws NetworkRetrivalFailed {
+		final SQLiteDatabase db = dbHelper.getWritableDatabase();
+		try {
+			final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+			qb.setTables(ServiceBulletins.TABLE_NAME);
+			/* don't query unless I am the only one querying/inserting */
+			synchronized (this) {
+				final Cursor c = qb.query(db, null, ServiceBulletins.System
+						+ " = ? AND " + ServiceBulletins.ForStop + " = ? AND "
+						+ ServiceBulletins.Expiration + " > ?", new String[] {
+						system, stpid, new Long(getToday()).toString() }, null,
+						null, null);
+				if (c.moveToLast()) {
+					c.close();
+					return;
+				} else
+					c.close();
+				db.delete(ServiceBulletins.TABLE_NAME, ServiceBulletins.System
+						+ "=? AND " + ServiceBulletins.ForStop + "=?",
+						new String[] { system, stpid });
+				ArrayList<ServiceBulletin> bulls = BusTimeAPI
+						.getServiceBulletinsContext(getContext(), system, stpid);
+				for (ServiceBulletin bull : bulls) {
+					ContentValues cv = new ContentValues();
+					cv.put(ServiceBulletins.System, system);
+					cv.put(ServiceBulletins.ForStop, stpid);
+					cv.put(ServiceBulletins.Name, bull.getName());
+					cv.put(ServiceBulletins.Subject, bull.getSubject());
+					cv.put(ServiceBulletins.Brief, bull.getBrief());
+					cv.put(ServiceBulletins.Detail, bull.getDetail());
+					cv.put(ServiceBulletins.Priority, bull.getPriority());
+					cv.put(ServiceBulletins.Expiration, getTomorrow());
+					db.insert(ServiceBulletins.TABLE_NAME, null, cv);
+				}
+			}
+		} catch (Exception e) {
+			Log.e(TAG, e.toString());
+			throw new NetworkRetrivalFailed(e.getMessage());
+		}
 	}
 
 	private long getTomorrow() {

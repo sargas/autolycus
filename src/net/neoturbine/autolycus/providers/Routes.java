@@ -39,5 +39,5 @@ public class Routes implements BaseColumns {
 	public static final String RouteName = "rtnm";
 	public static final String System = "system";
 
-	public static final String Expiration = "expires";
+	static final String Expiration = "expires";
 }

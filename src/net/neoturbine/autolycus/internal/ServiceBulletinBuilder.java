@@ -14,6 +14,7 @@ import android.util.Log;
  *
  */
 public class ServiceBulletinBuilder {
+	private final static String TAG = "Autolycus";
 	private boolean isSet = false;
 	
 	private String name;
@@ -43,10 +44,10 @@ public class ServiceBulletinBuilder {
 			brief = value;
 		else if (tag.equals("prty"))
 			priority = value;
-		else if(tag.equals("rt") || tag.equals("srvc") || tag.equals("rtdir"))
-			Log.w("Bus Track", "Skipping rt|srvc|rtdir");
+		else if(tag.equals("rt") || tag.equals("srvc") || tag.equals("rtdir") || tag.equals("stpid") || tag.equals("stpnm"))
+			Log.w(TAG, "Skipping information about what service is affected - unable to handle for now");
 		else
-			Log.w("Bus Track", "Unknown in ServiceBulletin object: " + tag + " = "
+			Log.w(TAG, "Unknown in ServiceBulletin object: " + tag + " = "
 					+ value);
 	}
 }
