@@ -26,4 +26,41 @@
 		android:layout_centerHorizontal="true" android:layout_below="@+id/predictions_showall"
 		android:textAppearance="?android:attr/textAppearanceMedium" 
 		android:gravity="center_horizontal" />
+		
+	<SlidingDrawer android:id="@+id/prediction_bull_drawer"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:handle="@+id/prediction_bull_handle"
+		android:content="@+id/prediction_bull_content"
+		android:visibility="gone" >
+		
+		<LinearLayout android:id="@+id/prediction_bull_handle"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:background="#000000">
+			<ImageView
+				android:src="@android:drawable/ic_menu_more"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+			<TextView
+				android:text="@string/bulletins_drawer_title"
+				android:gravity="center_vertical|center_horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:textAppearance="?android:attr/textAppearanceLarge" />
+		</LinearLayout>
+		
+		<LinearLayout
+			android:id="@+id/prediction_bull_content"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:background="#000000"
+			android:padding="2dip">
+			<ListView android:id="@+id/prediction_bull_list"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="#000000" />
+		</LinearLayout>
+	</SlidingDrawer>
 </RelativeLayout>

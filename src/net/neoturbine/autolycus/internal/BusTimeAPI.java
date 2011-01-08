@@ -408,5 +408,53 @@ public final class BusTimeAPI {
 			preds.add(curBuilder.toPrediction());
 		return preds;
 	}
+	
+	public static ArrayList<ServiceBulletin> getServiceBulletinsContext (Context context,
+			String system, String stopID)  throws Exception {
+		ArrayList<ServiceBulletin> sbs = new ArrayList<ServiceBulletin>();
+		Bundle params = new Bundle();
+		params.putString("stpid", stopID);
+		ServiceBulletinBuilder curBuilder = new ServiceBulletinBuilder();
+		XmlPullParser xpp = BusTimeAPI.loadData(context, "getservicebulletins",
+				system, params);
+		int eventType = xpp.getEventType();
+		String curTag = "";
+		BusTimeError err = null;
+		while (eventType != XmlPullParser.END_DOCUMENT) {
+			switch (eventType) {
+			case XmlPullParser.START_TAG:
+				curTag = xpp.getName();
+				if (curTag.equals("sb")) {
+					if (curBuilder.isSet()) {
+						sbs.add(curBuilder.toBulletin());
+					}
+					curBuilder = new ServiceBulletinBuilder();
+				} else if (curTag.equals("error")) {
+					err = new BusTimeError();
+				}
+				break;
+			case XmlPullParser.TEXT:
+				String text = xpp.getText().trim();
+				if (!curTag.equals("") && !text.equals("")) {
+					if (err != null)
+						err.setField(curTag, text);
+					else {
+						curBuilder.setField(curTag, text);
+					}
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				curTag = "";
+				break;
+			}
+			eventType = xpp.next(); // moving on....
+		}
+		if (err != null)
+			throw err;
+
+		if (curBuilder.isSet())
+			sbs.add(curBuilder.toBulletin());
+		return sbs;
+	}
 
 }
