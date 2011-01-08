@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="net.neoturbine.autolycus" android:versionCode="3" android:versionName="1.1">
 
-	<application android:label="@string/app_name" android:icon="@drawable/ic_launcher">
+	<application android:label="@string/app_name" android:icon="@drawable/ic_launcher_black">
 		<provider android:name=".providers.AutolycusProvider"
 			android:syncable="false" android:authorities="net.neoturbine.providers.autolycus" />
 		<activity android:name="BusShortcuts" android:configChanges="orientation|keyboardHidden" android:label="@string/shortcut">
@@ -39,7 +39,7 @@
 			</intent-filter>
 		</activity>
 	<activity android:label="@string/prefs_title" android:name=".prefs.Prefs"></activity>
-<activity android:name="AboutScreen" android:label="@string/app_name" android:icon="@drawable/ic_launcher"><intent-filter><action android:name="android.intent.action.MAIN"></action>
+<activity android:name="AboutScreen" android:label="@string/app_name" android:icon="@drawable/ic_launcher_black"><intent-filter><action android:name="android.intent.action.MAIN"></action>
 <category android:name="android.intent.category.LAUNCHER"></category>
 </intent-filter>
 </activity>

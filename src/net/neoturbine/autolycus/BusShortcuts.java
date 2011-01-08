@@ -117,7 +117,7 @@ public class BusShortcuts extends Activity {
 				((TextView) findViewById(R.id.shortcut_stopname)).getText()
 						.toString());
 		Parcelable iconResource = Intent.ShortcutIconResource.fromContext(this,
-				R.drawable.ic_launcher_yellow);
+				R.drawable.ic_launcher_black);
 		intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
 
 		setResult(RESULT_OK, intent);

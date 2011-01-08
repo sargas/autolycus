@@ -1,7 +1,6 @@
 - Finish Javadoc-ing
 - Add 'View Map' to prediction context menu
 - Integrate service bulletins
-- Transparent icon for home screen?
 - REMOVE UGLY HACK for mta's East+bound/Eastbound confusion when they fix their stuff
 - Change AsyncTask to AsyncQueryHandler where appriorite
 - Use https://code.google.com/p/zippy-android/source/browse/trunk/examples/SharedPreferencesCompat.java
