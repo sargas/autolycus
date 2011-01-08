@@ -39,4 +39,5 @@
 	<string name="prediction_details_title">Details</string>
 	
 	<string name="bulletins_details_title">Service Bulletin</string>
+	<string name="bulletins_drawer_title">Service Bulletins</string>
 </resources>

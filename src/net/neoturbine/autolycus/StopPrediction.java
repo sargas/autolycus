@@ -94,6 +94,12 @@ public class StopPrediction extends ListActivity {
 	 * and direction.
 	 */
 	private boolean limitRoute = true;
+	
+	/**
+	 * We want to make sure this cursor gets closed, because managedQuery doesn't
+	 * seem to be called by AsyncQueryHandler
+	 */
+	private Cursor serviceBulletinCursor = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -153,6 +159,7 @@ public class StopPrediction extends ListActivity {
 	 * Load service bulletins and populate the UI as needed
 	 */
 	private void loadBulletins() {
+		if(serviceBulletinCursor != null) serviceBulletinCursor.close();
 		new AsyncQueryHandler(getContentResolver()) {
 			@Override
 			protected void onQueryComplete(int token, Object cookie,
@@ -232,6 +239,7 @@ public class StopPrediction extends ListActivity {
 	public void onPause() {
 		super.onPause();
 		timerHandler.removeCallbacks(updateViewsTask);
+		if(serviceBulletinCursor != null) serviceBulletinCursor.close();
 	}
 
 	/**
