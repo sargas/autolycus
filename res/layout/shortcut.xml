@@ -46,9 +46,14 @@
 		android:scrollHorizontally="true"
 		android:gravity="right"
 		android:layout_below="@+id/shortcut_stopname_label"/>
+<Gallery
+	android:id="@+id/shortcut_icon"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_below="@+id/shortcut_stopname"/>
 <Button
 	android:id="@+id/shortcut_submit"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content" android:text="@string/shortcut_submit"
-	android:layout_below="@+id/shortcut_stopname" />
+	android:layout_below="@+id/shortcut_icon" />
 </RelativeLayout>

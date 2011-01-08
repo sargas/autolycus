@@ -23,8 +23,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Gallery;
 import android.widget.TextView;
 
 /**
@@ -39,11 +41,14 @@ public class BusShortcuts extends Activity {
 	 * Request Code for passing to startActivityForResult.
 	 */
 	private static final int PICK_STOP = 1;
+
 	private String system;
 	private String route;
 	private String direction;
 	private String stopname;
 	private int stopid;
+
+	private int selectedIcon = R.drawable.ic_launcher_black;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -83,6 +88,21 @@ public class BusShortcuts extends Activity {
 				((EditText) findViewById(R.id.shortcut_stopname))
 						.setText(stopname);
 
+				final Gallery g = (Gallery) findViewById(R.id.shortcut_icon);
+				g.setAdapter(new IconAdapter(this));
+				g.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+					@Override
+					public void onItemSelected(AdapterView<?> parent,
+							View view, int position, long id) {
+						selectedIcon = ((Integer) g.getItemAtPosition(position))
+								.intValue();
+					}
+
+					@Override
+					public void onNothingSelected(AdapterView<?> parent) {
+					}
+				});
+
 				((Button) findViewById(R.id.shortcut_submit))
 						.setOnClickListener(new View.OnClickListener() {
 							@Override
@@ -117,7 +137,7 @@ public class BusShortcuts extends Activity {
 				((TextView) findViewById(R.id.shortcut_stopname)).getText()
 						.toString());
 		Parcelable iconResource = Intent.ShortcutIconResource.fromContext(this,
-				R.drawable.ic_launcher_black);
+				selectedIcon);
 		intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
 
 		setResult(RESULT_OK, intent);
