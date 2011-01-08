@@ -26,4 +26,27 @@
 		android:layout_centerHorizontal="true" android:layout_below="@+id/predictions_showall"
 		android:textAppearance="?android:attr/textAppearanceMedium" 
 		android:gravity="center_horizontal" />
+		
+	<SlidingDrawer android:id="@+id/prediction_bull_drawer"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:handle="@+id/prediction_bull_handle"
+		android:content="@+id/prediction_bull_content"
+		android:visibility="gone" >
+		
+		<ImageView android:id="@+id/prediction_bull_handle"
+			android:src="@android:drawable/ic_menu_more"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content" />
+		
+		<LinearLayout
+			android:id="@+id/prediction_bull_content"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:background="#000000">
+			<ListView android:id="@+id/prediction_bull_list"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" />
+		</LinearLayout>
+	</SlidingDrawer>
 </RelativeLayout>

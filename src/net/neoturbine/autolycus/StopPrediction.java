@@ -17,11 +17,16 @@
  */
 package net.neoturbine.autolycus;
 
+import java.util.regex.Pattern;
 import net.neoturbine.autolycus.prefs.Prefs;
 import net.neoturbine.autolycus.providers.AutolycusProvider;
 import net.neoturbine.autolycus.providers.Predictions;
+import net.neoturbine.autolycus.providers.ServiceBulletins;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.content.AsyncQueryHandler;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -30,14 +35,17 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -137,6 +145,80 @@ public class StopPrediction extends ListActivity {
 		TextView titleView = (TextView) findViewById(R.id.txt_stop_name);
 		titleView.setText("Route " + route + ": " + stpnm);
 		((TextView) findViewById(R.id.txt_stop_dir)).setText(direction);
+
+		loadBulletins();
+	}
+
+	/**
+	 * Load service bulletins and populate the UI as needed
+	 */
+	private void loadBulletins() {
+		new AsyncQueryHandler(getContentResolver()) {
+			@Override
+			protected void onQueryComplete(int token, Object cookie,
+					Cursor cursor) {
+				final View drawer = findViewById(R.id.prediction_bull_drawer);
+				final ListView list = (ListView) findViewById(R.id.prediction_bull_list);
+				if (!cursor.moveToFirst()) {
+					cursor.close();
+					drawer.setVisibility(View.GONE);
+					return;
+				}
+				SimpleCursorAdapter scta = new SimpleCursorAdapter(
+						findViewById(R.id.prediction_bull_content).getContext(),
+						android.R.layout.simple_list_item_1, cursor,
+						new String[] { ServiceBulletins.Name },
+						new int[] { android.R.id.text1 });
+				drawer.setVisibility(View.VISIBLE);
+				list.setAdapter(scta);
+				list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view,
+							int position, long id) {
+						showBulletin((Cursor) list.getItemAtPosition(position));
+					}
+				});
+			}
+		}.startQuery(0, null, ServiceBulletins.CONTENT_URI, null,
+				ServiceBulletins.System + " = ? AND "
+						+ ServiceBulletins.ForStop + " = ?", new String[] {
+						system, Integer.toString(stpid) }, null);
+	}
+
+	private void showBulletin(Cursor c) {
+		LayoutInflater inflater = (LayoutInflater) getApplicationContext()
+				.getSystemService(LAYOUT_INFLATER_SERVICE);
+
+		View layout = inflater.inflate(R.layout.bulletin_detail, null);
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle(R.string.bulletins_details_title);
+
+		((TextView) layout.findViewById(R.id.prediction_bull_name)).setText(c
+				.getString(c.getColumnIndexOrThrow(ServiceBulletins.Name)));
+		((TextView) layout.findViewById(R.id.prediction_bull_subject))
+				.setText(c.getString(c
+						.getColumnIndexOrThrow(ServiceBulletins.Subject)));
+
+		String details = c.getString(c
+				.getColumnIndexOrThrow(ServiceBulletins.Detail));
+		details = Pattern.compile("<br/>").matcher(details).replaceAll("\n");
+		((TextView) layout.findViewById(R.id.prediction_bull_details))
+				.setText(details);
+
+		dialog.setView(layout);
+		dialog.setPositiveButton(android.R.string.ok,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+
+		Dialog finishedDialog = dialog.create();
+		finishedDialog.setOwnerActivity(this);
+		finishedDialog.show();
 	}
 
 	@Override
@@ -298,7 +380,7 @@ public class StopPrediction extends ListActivity {
 
 			Dialog dialog = new Dialog(this);
 			dialog.setContentView(R.layout.prediction_detail);
-			dialog.setTitle("Details");
+			dialog.setTitle(getString(R.string.prediction_details_title));
 
 			((TextView) dialog.findViewById(R.id.prediction_detail_sys))
 					.setText(c.getString(c

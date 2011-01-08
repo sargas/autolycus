@@ -18,7 +18,6 @@
 package net.neoturbine.autolycus;
 
 import net.neoturbine.autolycus.prefs.Prefs;
-import net.neoturbine.autolycus.providers.ServiceBulletins;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -58,8 +57,6 @@ public class AboutScreen extends Activity {
 			return;
 		}
 		appname.setText(getString(R.string.app_name) + " " + info.versionName);
-		
-		this.managedQuery(ServiceBulletins.CONTENT_URI, null, ServiceBulletins.System + " = ? AND " + ServiceBulletins.ForStop + " = ?", new String[] {"Chicago Transit Authority", "1102"}, null);
 	}
 
 	@Override

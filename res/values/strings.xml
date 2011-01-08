@@ -35,4 +35,8 @@
 	<string name="about_help">To use: From the home screen, press the Menu button. Choose \'Add\', and then choose the option to add \'Shortcuts\'. Autolycus Bus Predictions should be among the choices. Use folders in the home screen to organize multiple bus stops.</string>
 	
 	<string name="predictionview_delayed">Delayed</string>
+	
+	<string name="prediction_details_title">Details</string>
+	
+	<string name="bulletins_details_title">Service Bulletin</string>
 </resources>

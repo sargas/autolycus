@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:layout_weight="1" android:id="@+id/prediction_bull">
+		<RelativeLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+			<TextView
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/prediction_bull_name" 
+				android:gravity="center"
+				android:textAppearance="?android:attr/textAppearanceLarge" />
+			<TextView
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/prediction_bull_subject"
+				android:layout_below="@+id/prediction_bull_name"
+				android:paddingBottom="5dip"
+				android:gravity="right"/>
+			
+			<TextView
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:id="@+id/prediction_bull_details"
+				android:layout_below="@+id/prediction_bull_subject"/>
+			</RelativeLayout>
+</ScrollView>
