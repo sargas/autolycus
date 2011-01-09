@@ -49,7 +49,7 @@ public class AutolycusProvider extends ContentProvider {
 	public static final String ERROR_MSG = "error";
 
 	public static final String DATABASE_NAME = "cache.db";
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 
 	private static final UriMatcher uriMatcher;
 	private static final int URI_ROUTES = 1;
@@ -134,6 +134,7 @@ public class AutolycusProvider extends ContentProvider {
 					.append(" ( ").append(ServiceBulletins._ID)
 					.append(" INTEGER PRIMARY KEY AUTOINCREMENT, '")
 					.append(ServiceBulletins.System)
+					.append("' VARCHAR(255), '").append(ServiceBulletins.Route)
 					.append("' VARCHAR(255), '").append(ServiceBulletins.Name)
 					.append("' VARCHAR(255), '")
 					.append(ServiceBulletins.Subject)
@@ -278,8 +279,9 @@ public class AutolycusProvider extends ContentProvider {
 			case URI_BULLETINS:
 				qb.setTables(ServiceBulletins.TABLE_NAME);
 				// selection should be
-				// 'system=? forstop=?'
-				fetchBulletins(selectionArgs[0], selectionArgs[1]);
+				// 'system=? forstop=? route=?'
+				fetchBulletins(selectionArgs[0], selectionArgs[1],
+						selectionArgs[2]);
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown URI " + uri);
@@ -471,7 +473,7 @@ public class AutolycusProvider extends ContentProvider {
 		return cur;
 	}
 
-	private void fetchBulletins(String system, String stpid)
+	private void fetchBulletins(String system, String stpid, String route)
 			throws NetworkRetrivalFailed {
 		final SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try {
@@ -481,9 +483,11 @@ public class AutolycusProvider extends ContentProvider {
 			synchronized (this) {
 				final Cursor c = qb.query(db, null, ServiceBulletins.System
 						+ " = ? AND " + ServiceBulletins.ForStop + " = ? AND "
-						+ ServiceBulletins.Expiration + " > ?", new String[] {
-						system, stpid, new Long(getToday()).toString() }, null,
-						null, null);
+						+ ServiceBulletins.Route + " = ? AND "
+						+ ServiceBulletins.Expiration + " > ?",
+						new String[] { system, stpid, route,
+								new Long(getToday()).toString() }, null, null,
+						null);
 				if (c.moveToLast()) {
 					c.close();
 					return;
@@ -493,11 +497,13 @@ public class AutolycusProvider extends ContentProvider {
 						+ "=? AND " + ServiceBulletins.ForStop + "=?",
 						new String[] { system, stpid });
 				ArrayList<ServiceBulletin> bulls = BusTimeAPI
-						.getServiceBulletinsContext(getContext(), system, stpid);
+						.getServiceBulletinsContext(getContext(), system,
+								stpid, route);
 				for (ServiceBulletin bull : bulls) {
 					ContentValues cv = new ContentValues();
 					cv.put(ServiceBulletins.System, system);
 					cv.put(ServiceBulletins.ForStop, stpid);
+					cv.put(ServiceBulletins.Route, route);
 					cv.put(ServiceBulletins.Name, bull.getName());
 					cv.put(ServiceBulletins.Subject, bull.getSubject());
 					cv.put(ServiceBulletins.Brief, bull.getBrief());

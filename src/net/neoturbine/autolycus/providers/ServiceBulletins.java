@@ -22,6 +22,7 @@ public class ServiceBulletins implements BaseColumns {
 	static final String TABLE_NAME = "servicebulletins";
 	
 	public static final String System = "system";
+	public static final String Route = "rt";
 	
 	public static final String Name = "nm";
 	public static final String Subject = "sbj";

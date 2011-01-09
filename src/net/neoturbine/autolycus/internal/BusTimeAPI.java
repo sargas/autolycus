@@ -410,10 +410,11 @@ public final class BusTimeAPI {
 	}
 	
 	public static ArrayList<ServiceBulletin> getServiceBulletinsContext (Context context,
-			String system, String stopID)  throws Exception {
+			String system, String stopID, String route)  throws Exception {
 		ArrayList<ServiceBulletin> sbs = new ArrayList<ServiceBulletin>();
 		Bundle params = new Bundle();
 		params.putString("stpid", stopID);
+		params.putString("rt", route);
 		ServiceBulletinBuilder curBuilder = new ServiceBulletinBuilder();
 		XmlPullParser xpp = BusTimeAPI.loadData(context, "getservicebulletins",
 				system, params);

@@ -174,7 +174,7 @@ public class StopPrediction extends ListActivity {
 				SimpleCursorAdapter scta = new SimpleCursorAdapter(
 						findViewById(R.id.prediction_bull_content).getContext(),
 						android.R.layout.simple_list_item_1, cursor,
-						new String[] { ServiceBulletins.Name },
+						new String[] { ServiceBulletins.Subject },
 						new int[] { android.R.id.text1 });
 				drawer.setVisibility(View.VISIBLE);
 				list.setAdapter(scta);
@@ -188,8 +188,9 @@ public class StopPrediction extends ListActivity {
 			}
 		}.startQuery(0, null, ServiceBulletins.CONTENT_URI, null,
 				ServiceBulletins.System + " = ? AND "
-						+ ServiceBulletins.ForStop + " = ?", new String[] {
-						system, Integer.toString(stpid) }, null);
+						+ ServiceBulletins.ForStop + " = ? AND "
+						+ ServiceBulletins.Route + " = ?", new String[] {
+						system, Integer.toString(stpid), route }, null);
 	}
 
 	private void showBulletin(Cursor c) {
