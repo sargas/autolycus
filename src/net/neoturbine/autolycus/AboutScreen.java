@@ -28,6 +28,7 @@ import android.text.util.Linkify;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 /**
@@ -74,6 +75,17 @@ public class AboutScreen extends Activity {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Launch an activity to add a shortcut to the home screen. Called from the
+	 * onClick attribute of a button.
+	 * 
+	 * @param target
+	 */
+	public void addShortcut(View target) {
+		Intent intent = new Intent(this,BusShortcuts.class);
+		startActivity(intent);
 	}
 
 }

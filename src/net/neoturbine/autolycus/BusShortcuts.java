@@ -50,6 +50,8 @@ public class BusShortcuts extends Activity {
 
 	private int selectedIcon = R.drawable.ic_launcher_black;
 
+	private boolean returnShortcut;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -57,14 +59,9 @@ public class BusShortcuts extends Activity {
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 
-		if (Intent.ACTION_CREATE_SHORTCUT.equals(action)) {
-			Intent stopintent = new Intent(Intent.ACTION_PICK,
-					Routes.CONTENT_URI);
-			startActivityForResult(stopintent, PICK_STOP);
-		} else {
-			setResult(RESULT_CANCELED);
-			finish();
-		}
+		returnShortcut = Intent.ACTION_CREATE_SHORTCUT.equals(action);
+		Intent stopintent = new Intent(Intent.ACTION_PICK, Routes.CONTENT_URI);
+		startActivityForResult(stopintent, PICK_STOP);
 	}
 
 	@Override
@@ -117,7 +114,8 @@ public class BusShortcuts extends Activity {
 	/**
 	 * Creates a new shortcut on the home screen using the fields of this
 	 * activity and the value of the text box containing the name of the
-	 * shortcut.
+	 * shortcut. Either returns the shortcut (if called from the home screen) or
+	 * installs the shortcut.
 	 * 
 	 * @see net.neoturbine.StopPrediction#OPEN_STOP_ACTION
 	 */
@@ -139,8 +137,12 @@ public class BusShortcuts extends Activity {
 		Parcelable iconResource = Intent.ShortcutIconResource.fromContext(this,
 				selectedIcon);
 		intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
+		intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
 
-		setResult(RESULT_OK, intent);
+		if (returnShortcut)
+			setResult(RESULT_OK, intent);
+		else
+			sendBroadcast(intent);
 		finish();
 	}
 
