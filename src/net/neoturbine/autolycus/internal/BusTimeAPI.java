@@ -98,7 +98,7 @@ public final class BusTimeAPI {
 			server = "trip.osu.edu";
 			key = "auixft7SWR3pWAcgkQfnfJpXt";
 		} else if (system.equals("MTA New York City Transit")) {
-			server = "bustime.mta.info";
+			server = "bustime34.mta.info";
 			key = "t7YxRNCmvVCfrZzrcMFeYegjp";
 		}
 

@@ -185,6 +185,7 @@ public class StopPrediction extends ListActivity {
 						showBulletin((Cursor) list.getItemAtPosition(position));
 					}
 				});
+				serviceBulletinCursor = cursor;
 			}
 		}.startQuery(0, null, ServiceBulletins.CONTENT_URI, null,
 				ServiceBulletins.System + " = ? AND "
